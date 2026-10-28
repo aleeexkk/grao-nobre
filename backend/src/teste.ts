@@ -1,24 +1,15 @@
-import { Usuario } from "./entidades/Usuario";
-import { ErroValidacao } from "./erros/ErroValidacao";
+import { pool } from "./config/conexao";
 
-// Usuário válido: e-mail e CPF voltam já tratados
-const u = new Usuario("Alex", "Alex@Email.com", "Senha@123", "529.982.247-25");
-console.log(u.nome, u.email, u.cpf);
-
-// Alteração válida pelo setter
-u.nome = "Alex Silva";
-console.log(u.nome);
-
-// Alteração inválida: o setter barra com o erro personalizado
-try {
-    u.cpf = "111.111.111-11";
-} catch (erro) {
-    if (erro instanceof ErroValidacao) console.log("Capturou:", erro.message);
+// Pergunta pro banco quantos usuários existem (deve ser 0, a tabela está vazia)
+async function testar() {
+    try {
+        const [linhas] = await pool.query("SELECT COUNT(*) AS total FROM usuario");
+        console.log("Conectou! Usuários no banco:", linhas);
+    } catch (erro) {
+        console.log("Erro ao conectar:", erro);
+    } finally {
+        await pool.end(); // fecha as conexões pra o programa terminar
+    }
 }
 
-// Criação inválida: o construtor barra também
-try {
-    new Usuario("Alex", "alex@", "Senha@123", "529.982.247-25");
-} catch (erro) {
-    if (erro instanceof ErroValidacao) console.log("Capturou:", erro.message);
-}
+testar();
