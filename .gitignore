@@ -1,0 +1,11 @@
+# Pastas que NÃO devem ir pro GitHub (são pesadas e se recriam com npm install)
+node_modules/
+dist/
+
+# Arquivos com senhas e segredos: nunca sobem
+.env
+.env.*
+
+# Lixo do sistema
+Thumbs.db
+.DS_Store

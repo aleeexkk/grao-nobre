@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // Onde fica o código-fonte (.ts) e pra onde vai o código compilado (.js)
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Ambiente: Node moderno
+    "module": "nodenext",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node"], // sem isso o TypeScript não reconhece o Node
+
+    // Gera mapa pra erros apontarem pro arquivo .ts, não pro .js
+    "sourceMap": true,
+
+    // Modo estrito: obriga a tipar direito e não deixa "any" solto
+    "strict": true,
+
+    // Ignora checagem dentro das bibliotecas (evita erros que não são seus)
+    "skipLibCheck": true
+  },
+  // Só compila o que estiver dentro da pasta src
+  "include": ["src"]
+}
