@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import CartaoMetrica from "../components/CartaoMetrica";
-import CartaoGrafico from "../components/CartaoGrafico"; // NOVO
-import GraficoProdutos from "../components/graficos/GraficoProdutos"; // NOVO
+import CartaoGrafico from "../components/CartaoGrafico";
+import GraficoProdutos from "../components/graficos/GraficoProdutos";
+import GraficoFaturamentoDia from "../components/graficos/GraficoFaturamentoDia"; // NOVO
 import { VENDAS } from "../dados/vendas";
 import {
     faturamentoTotal,
@@ -50,12 +51,19 @@ export default function Dashboard() {
                 />
             </section>
 
-            {/* NOVO: primeiro gráfico */}
             <CartaoGrafico
                 titulo="Produtos mais vendidos"
                 descricao="Unidades vendidas de cada item do cardápio em outubro."
             >
                 <GraficoProdutos dados={ranking} />
+            </CartaoGrafico>
+
+            {/* NOVO: gráfico de linha */}
+            <CartaoGrafico
+                titulo="Faturamento por dia"
+                descricao="Série temporal de outubro. A linha tracejada é a média diária."
+            >
+                <GraficoFaturamentoDia dados={porDia} mediaDiaria={media(valoresDiarios)} />
             </CartaoGrafico>
 
             <Link to="/cadastro">Voltar ao cadastro</Link>
