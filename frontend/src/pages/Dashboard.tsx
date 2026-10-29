@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import CartaoMetrica from "../components/CartaoMetrica";
 import CartaoGrafico from "../components/CartaoGrafico";
 import GraficoProdutos from "../components/graficos/GraficoProdutos";
-import GraficoFaturamentoDia from "../components/graficos/GraficoFaturamentoDia"; // NOVO
+import GraficoFaturamentoDia from "../components/graficos/GraficoFaturamentoDia";
+import GraficoHorarios from "../components/graficos/GraficoHorarios";
 import { VENDAS } from "../dados/vendas";
 import {
     faturamentoTotal,
@@ -17,10 +18,12 @@ import {
 import { formatarMoeda } from "../utils/formatacao";
 
 export default function Dashboard() {
+    // Calcula tudo uma vez, a partir dos dados de exemplo
     const porDia = faturamentoPorDia(VENDAS);
     const valoresDiarios = porDia.map((d) => d.faturamento);
     const ranking = rankingProdutos(VENDAS);
-    const pico = vendasPorHora(VENDAS).reduce((maior, h) => (h.unidades > maior.unidades ? h : maior));
+    const porHora = vendasPorHora(VENDAS);
+    const pico = porHora.reduce((maior, h) => (h.unidades > maior.unidades ? h : maior));
 
     return (
         <main>
@@ -58,12 +61,18 @@ export default function Dashboard() {
                 <GraficoProdutos dados={ranking} />
             </CartaoGrafico>
 
-            {/* NOVO: gráfico de linha */}
             <CartaoGrafico
                 titulo="Faturamento por dia"
                 descricao="Série temporal de outubro. A linha tracejada é a média diária."
             >
                 <GraficoFaturamentoDia dados={porDia} mediaDiaria={media(valoresDiarios)} />
+            </CartaoGrafico>
+
+            <CartaoGrafico
+                titulo="Vendas por horário"
+                descricao="Unidades vendidas em cada faixa de 1 hora. A barra vermelha é o horário de pico."
+            >
+                <GraficoHorarios dados={porHora} />
             </CartaoGrafico>
 
             <Link to="/cadastro">Voltar ao cadastro</Link>
