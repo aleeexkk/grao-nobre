@@ -1,11 +1,26 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import CampoTexto from "../components/CampoTexto";
+import { validarEmail } from "../validadores/validadores";
 
-// Tela de cadastro: o formulário de verdade vem nos próximos passos
 export default function Cadastro() {
+    // useState = a "memória" do componente: guarda o que foi digitado
+    const [email, setEmail] = useState("");
+
     return (
         <main>
             <h1>Cadastro</h1>
-            <p>Em breve: formulário de cadastro.</p>
+
+            <CampoTexto
+                id="email"
+                rotulo="E-mail"
+                tipo="email"
+                valor={email}
+                aoMudar={setEmail}
+                // Só valida depois que a pessoa começou a digitar
+                erro={email ? validarEmail(email) : ""}
+            />
+
             <Link to="/login">Já tenho conta</Link>
         </main>
     );
