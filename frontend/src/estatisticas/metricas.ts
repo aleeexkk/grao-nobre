@@ -14,6 +14,17 @@ export interface VendasHora {
     hora: number;
     unidades: number;
 }
+export interface PontoPrecoQuantidade {
+    produto: string;
+    preco: number;
+    unidades: number;
+}
+export interface ResultadoRegressao {
+    inclinacao: number; // quanto o Y muda a cada 1 unidade a mais no X
+    intercepto: number; // onde a reta cruza o eixo Y
+    correlacao: number; // de -1 a +1
+    r2: number; // de 0 a 1 (correlação ao quadrado)
+}
 
 // Valor de uma linha de venda (quantidade x preço)
 function valorDaVenda(venda: Venda): number {
@@ -100,4 +111,44 @@ export function vendasPorHora(vendas: Venda[]): VendasHora[] {
         resultado.push({ hora, unidades: somar(lista.map((v) => v.quantidade)) });
     }
     return resultado;
+}
+
+// ---------- Dispersão e regressão ----------
+
+// Um ponto por produto: o preço dele e quantas unidades vendeu no mês
+export function precoVersusUnidades(vendas: Venda[]): PontoPrecoQuantidade[] {
+    const porProduto = agruparPor(vendas, (v) => v.produto);
+    return [...porProduto.entries()].map(([produto, lista]) => ({
+        produto,
+        preco: lista[0].valorUnitario, // o preço é o mesmo em todas as vendas do produto
+        unidades: somar(lista.map((v) => v.quantidade)),
+    }));
+}
+
+// Regressão linear simples (método dos mínimos quadrados): y = intercepto + inclinação * x
+export function regressaoLinear(x: number[], y: number[]): ResultadoRegressao {
+    // Precisa de pelo menos 2 pontos e listas do mesmo tamanho
+    if (x.length < 2 || x.length !== y.length) {
+        return { inclinacao: 0, intercepto: 0, correlacao: 0, r2: 0 };
+    }
+
+    const mediaX = media(x);
+    const mediaY = media(y);
+
+    let somaXY = 0; // soma de (desvio de x) * (desvio de y)
+    let somaXX = 0; // soma dos desvios de x ao quadrado
+    let somaYY = 0; // soma dos desvios de y ao quadrado
+    for (let i = 0; i < x.length; i++) {
+        const desvioX = x[i] - mediaX;
+        const desvioY = y[i] - mediaY;
+        somaXY += desvioX * desvioY;
+        somaXX += desvioX * desvioX;
+        somaYY += desvioY * desvioY;
+    }
+
+    const inclinacao = somaXX === 0 ? 0 : somaXY / somaXX;
+    const intercepto = mediaY - inclinacao * mediaX;
+    const correlacao = somaXX === 0 || somaYY === 0 ? 0 : somaXY / Math.sqrt(somaXX * somaYY);
+
+    return { inclinacao, intercepto, correlacao, r2: correlacao ** 2 };
 }

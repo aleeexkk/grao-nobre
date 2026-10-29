@@ -4,6 +4,7 @@ import CartaoGrafico from "../components/CartaoGrafico";
 import GraficoProdutos from "../components/graficos/GraficoProdutos";
 import GraficoFaturamentoDia from "../components/graficos/GraficoFaturamentoDia";
 import GraficoHorarios from "../components/graficos/GraficoHorarios";
+import GraficoDispersao from "../components/graficos/GraficoDispersao";
 import { VENDAS } from "../dados/vendas";
 import {
     faturamentoTotal,
@@ -14,6 +15,8 @@ import {
     faturamentoPorDia,
     rankingProdutos,
     vendasPorHora,
+    precoVersusUnidades,
+    regressaoLinear,
 } from "../estatisticas/metricas";
 import { formatarMoeda } from "../utils/formatacao";
 
@@ -24,6 +27,22 @@ export default function Dashboard() {
     const ranking = rankingProdutos(VENDAS);
     const porHora = vendasPorHora(VENDAS);
     const pico = porHora.reduce((maior, h) => (h.unidades > maior.unidades ? h : maior));
+
+    // Dispersão e regressão (preço x unidades vendidas)
+    const pontos = precoVersusUnidades(VENDAS);
+    const regressao = regressaoLinear(
+        pontos.map((p) => p.preco),
+        pontos.map((p) => p.unidades)
+    );
+
+    // Texto que explica o resultado em português
+    const sentido = regressao.inclinacao < 0 ? "a menos" : "a mais";
+    const textoRegressao =
+        `Reta de regressão: a cada R$ 1 a mais no preço, vendem-se em média ` +
+        `${Math.abs(regressao.inclinacao).toFixed(0)} unidades ${sentido}. ` +
+        `Correlação r = ${regressao.correlacao.toFixed(2)} e R² = ${regressao.r2.toFixed(2)}: ` +
+        `o preço explica cerca de ${(regressao.r2 * 100).toFixed(0)}% da variação nas vendas ` +
+        `(é uma associação, não uma prova de causa).`;
 
     return (
         <main>
@@ -73,6 +92,10 @@ export default function Dashboard() {
                 descricao="Unidades vendidas em cada faixa de 1 hora. A barra vermelha é o horário de pico."
             >
                 <GraficoHorarios dados={porHora} />
+            </CartaoGrafico>
+
+            <CartaoGrafico titulo="Preço x unidades vendidas" descricao={textoRegressao}>
+                <GraficoDispersao dados={pontos} regressao={regressao} />
             </CartaoGrafico>
 
             <Link to="/cadastro">Voltar ao cadastro</Link>
