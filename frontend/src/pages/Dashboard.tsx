@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import CartaoMetrica from "../components/CartaoMetrica";
+import CartaoGrafico from "../components/CartaoGrafico"; // NOVO
+import GraficoProdutos from "../components/graficos/GraficoProdutos"; // NOVO
 import { VENDAS } from "../dados/vendas";
 import {
     faturamentoTotal,
@@ -14,7 +16,6 @@ import {
 import { formatarMoeda } from "../utils/formatacao";
 
 export default function Dashboard() {
-    // Calcula tudo uma vez, a partir dos dados de exemplo
     const porDia = faturamentoPorDia(VENDAS);
     const valoresDiarios = porDia.map((d) => d.faturamento);
     const ranking = rankingProdutos(VENDAS);
@@ -48,6 +49,14 @@ export default function Dashboard() {
                     descricao={`${pico.unidades} unidades vendidas`}
                 />
             </section>
+
+            {/* NOVO: primeiro gráfico */}
+            <CartaoGrafico
+                titulo="Produtos mais vendidos"
+                descricao="Unidades vendidas de cada item do cardápio em outubro."
+            >
+                <GraficoProdutos dados={ranking} />
+            </CartaoGrafico>
 
             <Link to="/cadastro">Voltar ao cadastro</Link>
         </main>
