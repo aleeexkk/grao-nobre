@@ -5,6 +5,8 @@ dist/
 # Arquivos com senhas e segredos: nunca sobem
 .env
 .env.*
+# ...exceto o modelo sem segredos (esse pode subir)
+!.env.example
 
 # Lixo do sistema
 Thumbs.db
