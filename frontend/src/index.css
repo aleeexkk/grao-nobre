@@ -148,7 +148,7 @@ button:disabled {
 /* ===== Painel: cartões de métricas ===== */
 .cartoes {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 16px;
     margin: 24px 0;
 }

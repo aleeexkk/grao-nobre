@@ -8,3 +8,11 @@ export function formatarDiaMes(data: string): string {
     const [, mes, dia] = data.split("-"); // o "," pula o ano
     return `${dia}/${mes}`;
 }
+
+// Formata número com vírgula decimal: -0.2361 -> "-0,24" (casas = quantas casas decimais)
+export function formatarNumero(valor: number, casas: number): string {
+    return valor.toLocaleString("pt-BR", {
+        minimumFractionDigits: casas,
+        maximumFractionDigits: casas,
+    });
+}

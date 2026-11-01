@@ -18,6 +18,7 @@ import {
     precoVersusUnidades,
     regressaoLinear,
 } from "../estatisticas/metricas";
+import { descreverRegressao } from "../estatisticas/descricoes";
 import { formatarMoeda } from "../utils/formatacao";
 
 export default function Dashboard() {
@@ -34,15 +35,6 @@ export default function Dashboard() {
         pontos.map((p) => p.preco),
         pontos.map((p) => p.unidades)
     );
-
-    // Texto que explica o resultado em português
-    const sentido = regressao.inclinacao < 0 ? "a menos" : "a mais";
-    const textoRegressao =
-        `Reta de regressão: a cada R$ 1 a mais no preço, vendem-se em média ` +
-        `${Math.abs(regressao.inclinacao).toFixed(0)} unidades ${sentido}. ` +
-        `Correlação r = ${regressao.correlacao.toFixed(2)} e R² = ${regressao.r2.toFixed(2)}: ` +
-        `o preço explica cerca de ${(regressao.r2 * 100).toFixed(0)}% da variação nas vendas ` +
-        `(é uma associação, não uma prova de causa).`;
 
     return (
         <main>
@@ -94,7 +86,7 @@ export default function Dashboard() {
                 <GraficoHorarios dados={porHora} />
             </CartaoGrafico>
 
-            <CartaoGrafico titulo="Preço x unidades vendidas" descricao={textoRegressao}>
+            <CartaoGrafico titulo="Preço x unidades vendidas" descricao={descreverRegressao(regressao)}>
                 <GraficoDispersao dados={pontos} regressao={regressao} />
             </CartaoGrafico>
 
