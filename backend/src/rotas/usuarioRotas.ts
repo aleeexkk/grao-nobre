@@ -1,44 +1,43 @@
 import { Router } from "express";
-import type { Request, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { UsuarioServico } from "../servicos/UsuarioServico";
+import { usuarioLogado } from "../middlewares/autenticar";
+import { lerCamposTexto, lerId } from "../validadores/corpo";
 import { ErroValidacao } from "../erros/ErroValidacao";
-import { ErroConflito } from "../erros/ErroConflito";
 
-// Monta as rotas de usuário usando o serviço que recebemos de fora
-export function criarRotasUsuario(servico: UsuarioServico): Router {
+// Monta as rotas de usuário. "autenticar" é o porteiro que barra quem não está logado.
+// Os erros não precisam de try/catch aqui: o tratador de erros (middleware) cuida de todos.
+export function criarRotasUsuario(servico: UsuarioServico, autenticar: RequestHandler): Router {
     const rotas = Router();
 
-    // POST /usuarios -> cadastra um usuário novo
+    // POST /usuarios -> cadastra um usuário novo (pública)
     rotas.post("/", async (req: Request, res: Response) => {
-        // Pega os campos do corpo da requisição (se não veio corpo, usa objeto vazio)
-        const { nome, email, senha, cpf } = req.body ?? {};
-
         // Os 4 campos são obrigatórios e precisam ser texto
-        if (
-            typeof nome !== "string" ||
-            typeof email !== "string" ||
-            typeof senha !== "string" ||
-            typeof cpf !== "string"
-        ) {
-            res.status(400).json({ erro: "Informe nome, e-mail, senha e CPF." });
-            return;
+        const dados = lerCamposTexto(req.body, ["nome", "email", "senha", "cpf"], "Informe nome, e-mail, senha e CPF.");
+        res.status(201).json(await servico.cadastrar(dados)); // 201 = criado com sucesso
+    });
+
+    // GET /usuarios/me -> dados de quem está logado (protegida)
+    // (fica ANTES de "/:id" pra "me" não ser lido como se fosse um id)
+    rotas.get("/me", autenticar, async (req: Request, res: Response) => {
+        res.json(await servico.buscarPerfil(usuarioLogado(req).id));
+    });
+
+    // PUT /usuarios/:id -> edita o usuário (protegida; só o próprio usuário)
+    rotas.put("/:id", autenticar, async (req: Request, res: Response) => {
+        const logado = usuarioLogado(req);
+        const idAlvo = lerId(req.params.id);
+
+        // Nome, CPF e senha são obrigatórios
+        const { nome, cpf, senha } = lerCamposTexto(req.body, ["nome", "cpf", "senha"], "Informe nome, CPF e senha.");
+
+        // E-mail é opcional no corpo, mas se vier tem que ser texto (o serviço confere se é o mesmo)
+        const emailBruto = (req.body as Record<string, unknown>).email;
+        if (emailBruto !== undefined && typeof emailBruto !== "string") {
+            throw new ErroValidacao("Não é permitido alterar o e-mail.");
         }
 
-        try {
-            const criado = await servico.cadastrar({ nome, email, senha, cpf });
-            res.status(201).json(criado); // 201 = criado com sucesso
-        } catch (erro) {
-            if (erro instanceof ErroValidacao) {
-                res.status(400).json({ erro: erro.message }); // dado inválido
-                return;
-            }
-            if (erro instanceof ErroConflito) {
-                res.status(409).json({ erro: erro.message }); // já existe
-                return;
-            }
-            console.error(erro); // detalhe fica só no terminal do servidor
-            res.status(500).json({ erro: "Erro interno no servidor." }); // não vaza detalhes pra fora
-        }
+        res.json(await servico.atualizar(logado.id, idAlvo, { nome, cpf, senha, email: emailBruto }));
     });
 
     return rotas;

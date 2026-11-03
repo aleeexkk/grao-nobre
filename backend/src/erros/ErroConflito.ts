@@ -1,7 +1,6 @@
-// Erro personalizado: usado quando o dado é válido, mas já existe (ex: e-mail repetido)
-export class ErroConflito extends Error {
-    constructor(mensagem: string) {
-        super(mensagem);
-        this.name = "ErroConflito";
-    }
+import { ErroAplicacao } from "./ErroAplicacao";
+
+// Erro personalizado: o dado é válido, mas já existe (ex: e-mail repetido) (HTTP 409)
+export class ErroConflito extends ErroAplicacao {
+    readonly status = 409;
 }

@@ -1,7 +1,10 @@
 import bcrypt from "bcryptjs";
 import { Usuario } from "../entidades/Usuario";
-import { UsuarioRepositorio } from "../repositorios/UsuarioRepositorio";
+import type { IUsuarioRepositorio } from "../repositorios/IUsuarioRepositorio";
 import { ErroConflito } from "../erros/ErroConflito";
+import { ErroNaoEncontrado } from "../erros/ErroNaoEncontrado";
+import { ErroProibido } from "../erros/ErroProibido";
+import { ErroValidacao } from "../erros/ErroValidacao";
 
 // Formato dos dados que chegam do front-end no cadastro
 export interface DadosCadastro {
@@ -11,6 +14,15 @@ export interface DadosCadastro {
     cpf: string;
 }
 
+// Formato dos dados que chegam do front-end na edição.
+// O e-mail é opcional: se vier, precisa ser igual ao atual (e-mail não pode ser alterado)
+export interface DadosEdicao {
+    nome: string;
+    cpf: string;
+    senha: string;
+    email?: string;
+}
+
 // Formato do que devolvemos depois de cadastrar (sem a senha, nunca!)
 export interface UsuarioCadastrado {
     id: number;
@@ -18,12 +30,20 @@ export interface UsuarioCadastrado {
     email: string;
 }
 
+// Formato do perfil do usuário logado (também sem a senha)
+export interface PerfilUsuario {
+    id: number;
+    nome: string;
+    email: string;
+    cpf: string;
+}
+
 // Classe com as regras de negócio do usuário
 export class UsuarioServico {
-    private repositorio: UsuarioRepositorio;
+    private repositorio: IUsuarioRepositorio;
 
     // Recebe o repositório "de fora" (assim dá pra trocar ou testar sem mexer aqui)
-    constructor(repositorio: UsuarioRepositorio) {
+    constructor(repositorio: IUsuarioRepositorio) {
         this.repositorio = repositorio;
     }
 
@@ -45,5 +65,47 @@ export class UsuarioServico {
         // 4) Salva no banco e devolve só o que pode aparecer
         const id = await this.repositorio.inserir(usuario, senhaHash);
         return { id, nome: usuario.nome, email: usuario.email };
+    }
+
+    // Devolve o perfil de um usuário (usado pra mostrar os dados do usuário logado)
+    async buscarPerfil(id: number): Promise<PerfilUsuario> {
+        const registro = await this.repositorio.buscarPorId(id);
+        if (registro === null) {
+            throw new ErroNaoEncontrado("Usuário não encontrado.");
+        }
+        return { id: registro.id, nome: registro.nome, email: registro.email, cpf: registro.cpf };
+    }
+
+    // Edita o usuário. idLogado = quem está logado (vem do token); idAlvo = quem se quer editar
+    async atualizar(idLogado: number, idAlvo: number, dados: DadosEdicao): Promise<PerfilUsuario> {
+        // 1) Cada pessoa só edita o PRÓPRIO usuário
+        if (idLogado !== idAlvo) {
+            throw new ErroProibido("Você só pode editar o seu próprio usuário.");
+        }
+
+        // 2) O usuário precisa existir
+        const atual = await this.repositorio.buscarPorId(idAlvo);
+        if (atual === null) {
+            throw new ErroNaoEncontrado("Usuário não encontrado.");
+        }
+
+        // 3) O e-mail não pode mudar (se vier no corpo, tem que ser o mesmo de sempre)
+        if (dados.email !== undefined && dados.email.trim().toLowerCase() !== atual.email) {
+            throw new ErroValidacao("Não é permitido alterar o e-mail.");
+        }
+
+        // 4) Valida tudo de novo com a mesma classe do cadastro (nome, CPF e nível da senha)
+        const usuario = new Usuario(dados.nome, atual.email, dados.senha, dados.cpf, atual.id);
+
+        // 5) O CPF novo não pode ser de outra pessoa
+        if (await this.repositorio.existeCpfDeOutro(usuario.cpf, atual.id)) {
+            throw new ErroConflito("CPF já cadastrado.");
+        }
+
+        // 6) Criptografa a senha nova e salva
+        const senhaHash = await bcrypt.hash(dados.senha, 10);
+        await this.repositorio.atualizar(atual.id, usuario, senhaHash);
+
+        return { id: atual.id, nome: usuario.nome, email: atual.email, cpf: usuario.cpf };
     }
 }

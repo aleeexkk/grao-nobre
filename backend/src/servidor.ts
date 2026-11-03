@@ -1,21 +1,30 @@
-import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 import { UsuarioRepositorio } from "./repositorios/UsuarioRepositorio";
 import { UsuarioServico } from "./servicos/UsuarioServico";
-import { criarRotasUsuario } from "./rotas/usuarioRotas";
+import { AutenticacaoServico } from "./servicos/AutenticacaoServico";
+import { TokenServico } from "./servicos/TokenServico";
+import { criarApp } from "./app";
 
 dotenv.config(); // lê o .env
 
-const app = express();
+// A chave secreta do token é obrigatória: sem ela o servidor nem liga (melhor do que ficar inseguro)
+const segredo = process.env.JWT_SECRET ?? "";
+if (segredo.length < 16) {
+    console.error("Defina JWT_SECRET no arquivo .env (pelo menos 16 caracteres).");
+    console.error('Para gerar uma: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+    process.exit(1);
+}
 
-app.use(cors()); // deixa o front-end (outra porta) chamar a API
-app.use(express.json()); // faz o servidor entender JSON no corpo das requisições
+const DURACAO_DO_TOKEN = 2 * 60 * 60; // 2 horas, em segundos
 
-// Monta as peças: repositório -> serviço -> rotas
+// Monta as peças: repositório -> serviços -> app
 const repositorio = new UsuarioRepositorio();
-const servico = new UsuarioServico(repositorio);
-app.use("/usuarios", criarRotasUsuario(servico));
+const tokenServico = new TokenServico(segredo, DURACAO_DO_TOKEN);
+const app = criarApp({
+    usuarioServico: new UsuarioServico(repositorio),
+    autenticacaoServico: new AutenticacaoServico(repositorio, tokenServico),
+    tokenServico,
+});
 
 const porta = Number(process.env.PORT) || 3000;
 app.listen(porta, () => {
