@@ -1,11 +1,11 @@
 # Grão Nobre
 
-Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-end, Front-end, Estatística e Tech Forge). Este repositório está na Sprint 1.
+Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-end, Front-end, Estatística e Tech Forge).
 
 ## O que já tem
 
-- **Back-end** (Node + TypeScript + Express): cadastro de usuário em `POST /usuarios`, com validação de CPF, e-mail e senha. A senha é salva criptografada (bcrypt).
-- **Front-end** (React + TypeScript): tela de cadastro com confirmação de senha e um painel com métricas e gráficos de vendas (dados de exemplo).
+- **Back-end** (Node + TypeScript + Express): cadastro, login com JWT e edição de usuário (só o próprio usuário, e o e-mail não muda). Validação de CPF, e-mail e senha, e a senha é salva criptografada (bcrypt).
+- **Front-end** (React + TypeScript): telas de cadastro, login, perfil e um painel com métricas e gráficos de vendas (dados de exemplo). O usuário logado fica guardado num contexto e o token no `localStorage`.
 - **Banco** (MariaDB): o script está em `banco/grao_nobre.sql`.
 
 ## Como rodar
@@ -17,9 +17,16 @@ Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-
 ```
 cd backend
 copy .env.example .env
-npm install
-npx tsx src/servidor.ts
 ```
+
+Abra o `.env` e preencha o `JWT_SECRET` com um texto grande e aleatório (mínimo de 16 caracteres). Depois:
+
+```
+npm install
+npm run dev
+```
+
+Para rodar os testes do back-end: `npm test`.
 
 3. Front-end (porta 5173), em outro terminal:
 
