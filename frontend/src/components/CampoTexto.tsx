@@ -9,6 +9,9 @@ interface CampoTextoProps {
     tipo?: "text" | "email" | "password"; // o "?" = opcional (se não passar, vira "text")
     placeholder?: string; // dica cinza dentro da caixinha
     erro?: string; // mensagem de erro (vazia = sem erro)
+    desabilitado?: boolean; // true = a pessoa não consegue editar (ex: e-mail no perfil)
+    ajuda?: string; // texto pequeno de explicação embaixo da caixinha
+    autoComplete?: string; // ajuda o navegador a sugerir/preencher (ex: "email", "current-password")
 }
 
 // Componente genérico: serve pra qualquer campo de texto do site
@@ -20,6 +23,9 @@ export default function CampoTexto({
     tipo = "text",
     placeholder,
     erro,
+    desabilitado = false,
+    ajuda,
+    autoComplete,
 }: CampoTextoProps) {
     // Quando a pessoa digita, avisa quem usa o componente com o texto novo
     function tratarMudanca(evento: ChangeEvent<HTMLInputElement>) {
@@ -35,8 +41,12 @@ export default function CampoTexto({
                 value={valor}
                 placeholder={placeholder}
                 onChange={tratarMudanca}
+                disabled={desabilitado}
+                autoComplete={autoComplete}
                 aria-invalid={erro ? true : undefined} // avisa leitores de tela que tem erro
             />
+            {/* Texto de ajuda (só aparece se foi passado) */}
+            {ajuda && <span className="campo-ajuda">{ajuda}</span>}
             {/* Só mostra a mensagem se existir erro */}
             {erro && (
                 <span className="campo-erro" role="alert">

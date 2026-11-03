@@ -195,3 +195,85 @@ button:disabled {
     font-size: 0.95rem;
     color: var(--texto-suave);
 }
+/* ===== Área logada: cabeçalho ===== */
+.cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+    padding: 14px 24px;
+    color: #ffffff;
+    background: var(--cafe-escuro);
+}
+
+.cabecalho-marca {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.cabecalho nav {
+    display: flex;
+    flex: 1;
+    gap: 18px;
+}
+
+.cabecalho nav a {
+    padding: 4px 2px;
+    color: #f0dfc8;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+}
+
+.cabecalho nav a:hover,
+.cabecalho nav a.ativo {
+    color: #ffffff;
+}
+
+.cabecalho nav a.ativo {
+    border-bottom-color: #e0b27a;
+}
+
+.cabecalho-usuario {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* O botão "Sair" é pequeno (o botão padrão do site ocupa a largura toda) */
+.cabecalho-usuario button {
+    width: auto;
+    padding: 7px 16px;
+    font-size: 0.9rem;
+    background: transparent;
+    border: 1px solid #e0b27a;
+}
+
+.cabecalho-usuario button:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* ===== Mensagens e campos extras ===== */
+
+/* Mensagem de sucesso (ex: "Cadastro realizado!") */
+.sucesso-api {
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    color: #1e6b3a;
+    background: #e8f5ec;
+    border-radius: 10px;
+}
+
+/* Texto pequeno de ajuda embaixo do campo */
+.campo-ajuda {
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+}
+
+/* Campo que não pode ser editado (ex: e-mail no perfil) */
+.campo input:disabled {
+    color: var(--texto-suave);
+    background: #f1ebe2;
+    cursor: not-allowed;
+}

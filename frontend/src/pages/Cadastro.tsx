@@ -47,7 +47,7 @@ export default function Cadastro() {
         setEnviando(true);
         try {
             await cadastrarUsuario({ nome, email, senha, cpf });
-            navigate("/login"); // deu certo: vai pra tela de login
+            navigate("/login", { state: { cadastrado: true } }); // deu certo: vai pro login (e avisa que acabou de cadastrar)
         } catch (erro) {
             // Se for um ErroApi, mostra a mensagem dele; senão, uma mensagem genérica
             setErroApi(erro instanceof ErroApi ? erro.message : "Erro inesperado. Tente novamente.");

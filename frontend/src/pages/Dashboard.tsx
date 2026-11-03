@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import CartaoMetrica from "../components/CartaoMetrica";
 import CartaoGrafico from "../components/CartaoGrafico";
 import GraficoProdutos from "../components/graficos/GraficoProdutos";
@@ -89,8 +88,6 @@ export default function Dashboard() {
             <CartaoGrafico titulo="Preço x unidades vendidas" descricao={descreverRegressao(regressao)}>
                 <GraficoDispersao dados={pontos} regressao={regressao} />
             </CartaoGrafico>
-
-            <Link to="/cadastro">Voltar ao cadastro</Link>
         </main>
     );
 }

@@ -52,6 +52,11 @@ export function validarSenha(senha: string): string {
     return faltando.length > 0 ? `A senha precisa: ${faltando.join(", ")}.` : "";
 }
 
+// No LOGIN a senha só precisa ter sido digitada (a força da senha só importa no cadastro)
+export function validarSenhaObrigatoria(senha: string): string {
+    return senha === "" ? "Informe a sua senha." : "";
+}
+
 // Confere se a senha e a confirmação são iguais (a "verificação dupla" da rubrica)
 export function validarConfirmacao(senha: string, confirmacao: string): string {
     return senha === confirmacao ? "" : "As senhas não conferem.";
