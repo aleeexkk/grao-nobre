@@ -12,3 +12,10 @@ CREATE TABLE IF NOT EXISTS usuario (
     senha VARCHAR(255) NOT NULL,               -- guarda o hash (bcrypt), nunca a senha em texto puro
     cpf VARCHAR(11) NOT NULL UNIQUE            -- só os 11 números, sem pontos e traço
 );
+
+-- Tabela de categorias (as "gavetas" do cardápio: Cafés, Pães, Doces...)
+CREATE TABLE IF NOT EXISTS categoria (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY, -- número único, gerado pelo banco
+    nome VARCHAR(60) NOT NULL UNIQUE,            -- obrigatório e sem repetir ("Cafés" só uma vez)
+    descricao VARCHAR(200) NULL                  -- opcional
+);

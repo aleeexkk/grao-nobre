@@ -74,3 +74,38 @@ export function validarNome(nome: string): string {
 
     return limpo;
 }
+
+// Valida um texto obrigatório com tamanho mínimo e máximo.
+// "campo" é só o nome que aparece na mensagem de erro (ex: "Nome").
+export function validarTextoObrigatorio(
+    valor: string,
+    campo: string,
+    minimo: number,
+    maximo: number
+): string {
+    const limpo = valor.trim(); // tira espaços das pontas
+
+    if (limpo.length < minimo || limpo.length > maximo) {
+        throw new ErroValidacao(`${campo} deve ter entre ${minimo} e ${maximo} caracteres.`);
+    }
+
+    return limpo;
+}
+
+// Valida um texto opcional: se vier vazio ou nulo, vira null; se vier preenchido, respeita o máximo.
+export function validarTextoOpcional(
+    valor: string | null | undefined,
+    campo: string,
+    maximo: number
+): string | null {
+    if (valor === null || valor === undefined) return null; // não informou: tudo bem
+
+    const limpo = valor.trim();
+    if (limpo === "") return null; // só espaços = não informou
+
+    if (limpo.length > maximo) {
+        throw new ErroValidacao(`${campo} deve ter no máximo ${maximo} caracteres.`);
+    }
+
+    return limpo;
+}

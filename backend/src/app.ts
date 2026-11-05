@@ -2,16 +2,19 @@ import express from "express";
 import type { Express } from "express";
 import cors from "cors";
 import { UsuarioServico } from "./servicos/UsuarioServico";
+import { CategoriaServico } from "./servicos/CategoriaServico";
 import { AutenticacaoServico } from "./servicos/AutenticacaoServico";
 import { TokenServico } from "./servicos/TokenServico";
 import { criarAutenticacao } from "./middlewares/autenticar";
 import { tratadorErros } from "./middlewares/tratadorErros";
 import { criarRotasAutenticacao } from "./rotas/autenticacaoRotas";
 import { criarRotasUsuario } from "./rotas/usuarioRotas";
+import { criarRotasCategoria } from "./rotas/categoriaRotas";
 
 // Tudo que o app precisa receber "de fora" (injeção de dependência)
 export interface Dependencias {
     usuarioServico: UsuarioServico;
+    categoriaServico: CategoriaServico;
     autenticacaoServico: AutenticacaoServico;
     tokenServico: TokenServico;
 }
@@ -27,6 +30,7 @@ export function criarApp(dependencias: Dependencias): Express {
 
     app.use("/auth", criarRotasAutenticacao(dependencias.autenticacaoServico));
     app.use("/usuarios", criarRotasUsuario(dependencias.usuarioServico, autenticar));
+    app.use("/categorias", criarRotasCategoria(dependencias.categoriaServico, autenticar));
 
     // Rota que não existe: responde em JSON (e não com a página de erro padrão do Express)
     app.use((_req, res) => {

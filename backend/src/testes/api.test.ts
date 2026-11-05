@@ -4,9 +4,11 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { criarApp } from "../app";
 import { UsuarioServico } from "../servicos/UsuarioServico";
+import { CategoriaServico } from "../servicos/CategoriaServico";
 import { AutenticacaoServico } from "../servicos/AutenticacaoServico";
 import { TokenServico } from "../servicos/TokenServico";
 import { UsuarioRepositorioMemoria } from "./UsuarioRepositorioMemoria";
+import { CategoriaRepositorioMemoria } from "./CategoriaRepositorioMemoria";
 
 // Dois CPFs válidos de exemplo e uma senha forte
 const CPF_A = "529.982.247-25";
@@ -50,6 +52,7 @@ describe("API de usuários (cadastro, login e edição)", () => {
     before(async () => {
         const app = criarApp({
             usuarioServico: new UsuarioServico(repositorio),
+            categoriaServico: new CategoriaServico(new CategoriaRepositorioMemoria()),
             autenticacaoServico: new AutenticacaoServico(repositorio, tokens),
             tokenServico: tokens,
         });

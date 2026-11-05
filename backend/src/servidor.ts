@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import { UsuarioRepositorio } from "./repositorios/UsuarioRepositorio";
+import { CategoriaRepositorio } from "./repositorios/CategoriaRepositorio";
 import { UsuarioServico } from "./servicos/UsuarioServico";
+import { CategoriaServico } from "./servicos/CategoriaServico";
 import { AutenticacaoServico } from "./servicos/AutenticacaoServico";
 import { TokenServico } from "./servicos/TokenServico";
 import { criarApp } from "./app";
@@ -22,6 +24,7 @@ const repositorio = new UsuarioRepositorio();
 const tokenServico = new TokenServico(segredo, DURACAO_DO_TOKEN);
 const app = criarApp({
     usuarioServico: new UsuarioServico(repositorio),
+    categoriaServico: new CategoriaServico(new CategoriaRepositorio()),
     autenticacaoServico: new AutenticacaoServico(repositorio, tokenServico),
     tokenServico,
 });
