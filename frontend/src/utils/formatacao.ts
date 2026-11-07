@@ -28,3 +28,10 @@ export function formatarNumero(valor: number, casas: number): string {
         maximumFractionDigits: casas,
     });
 }
+
+// Transforma "2026-11-07 15:30:00" em "07/11/2026 15:30"
+export function formatarDataHora(dataHora: string): string {
+    const [data = "", hora = ""] = dataHora.split(" ");
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}/${ano} ${hora.slice(0, 5)}`;
+}

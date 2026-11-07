@@ -1,7 +1,11 @@
-import { lerToken } from "./sessao";
+import { avisarSessaoExpirada, lerToken } from "./sessao";
 
-// Endereço do back-end
-const URL_API = "http://localhost:3000";
+// Endereço do back-end. No dia a dia é http://localhost:3000; no Docker o endereço é definido
+// na hora de montar a imagem (variável VITE_API_URL, veja o docker-compose.yml).
+const URL_API: string =
+    typeof import.meta.env.VITE_API_URL === "string" && import.meta.env.VITE_API_URL !== ""
+        ? import.meta.env.VITE_API_URL
+        : "http://localhost:3000";
 
 // ===== Formatos dos dados que vão e voltam da API =====
 
@@ -53,8 +57,8 @@ export class ErroApi extends Error {
 // Função única que faz TODAS as chamadas à API (assim o tratamento de erro fica num lugar só).
 // <T> (generics) = o tipo do que esperamos receber de volta.
 // comToken = true manda o token no cabeçalho (rotas protegidas).
-async function requisicao<T>(
-    metodo: "GET" | "POST" | "PUT",
+export async function requisicao<T>(
+    metodo: "GET" | "POST" | "PUT" | "DELETE",
     caminho: string,
     corpo?: unknown,
     comToken = false
@@ -86,6 +90,11 @@ async function requisicao<T>(
 
     // Respostas 400, 401, 403, 409, 500... (qualquer coisa fora de 2xx)
     if (!resposta.ok) {
+        // Token vencido no meio do uso: avisa o site (que volta pro login) e mostra uma mensagem clara
+        if (comToken && resposta.status === 401) {
+            avisarSessaoExpirada();
+            throw new ErroApi("Sua sessão expirou. Entre novamente.", 401);
+        }
         // O back-end manda { erro: "mensagem" }: mostramos essa mensagem
         if (typeof dados === "object" && dados !== null && "erro" in dados && typeof dados.erro === "string") {
             throw new ErroApi(dados.erro, resposta.status);
@@ -113,4 +122,9 @@ export function buscarPerfil(): Promise<PerfilUsuario> {
 
 export function atualizarPerfil(id: number, dados: DadosEdicao): Promise<PerfilUsuario> {
     return requisicao<PerfilUsuario>("PUT", `/usuarios/${id}`, dados, true);
+}
+
+// Transforma qualquer erro numa mensagem pronta pra tela (erros da API já trazem a mensagem certa)
+export function mensagemDeErro(erro: unknown): string {
+    return erro instanceof ErroApi ? erro.message : "Erro inesperado. Tente novamente.";
 }

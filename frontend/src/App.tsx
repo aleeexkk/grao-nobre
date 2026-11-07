@@ -5,6 +5,14 @@ import Cadastro from "./pages/Cadastro";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
+import ListaCategorias from "./pages/categorias/ListaCategorias";
+import FormCategoria from "./pages/categorias/FormCategoria";
+import ListaProdutos from "./pages/produtos/ListaProdutos";
+import FormProduto from "./pages/produtos/FormProduto";
+import ListaPedidos from "./pages/pedidos/ListaPedidos";
+import FormPedido from "./pages/pedidos/FormPedido";
+import DetalhePedido from "./pages/pedidos/DetalhePedido";
+import FormItemPedido from "./pages/pedidos/FormItemPedido";
 
 export default function App() {
     return (
@@ -22,6 +30,23 @@ export default function App() {
                     <Route element={<AreaLogada />}>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/perfil" element={<Perfil />} />
+
+                        {/* Cada CRUD tem uma tela de LISTA e uma de FORMULÁRIO (cadastrar/editar) */}
+                        <Route path="/categorias" element={<ListaCategorias />} />
+                        <Route path="/categorias/novo" element={<FormCategoria />} />
+                        <Route path="/categorias/:id/editar" element={<FormCategoria />} />
+
+                        <Route path="/produtos" element={<ListaProdutos />} />
+                        <Route path="/produtos/novo" element={<FormProduto />} />
+                        <Route path="/produtos/:id/editar" element={<FormProduto />} />
+
+                        <Route path="/pedidos" element={<ListaPedidos />} />
+                        <Route path="/pedidos/novo" element={<FormPedido />} />
+                        <Route path="/pedidos/:id/editar" element={<FormPedido />} />
+                        {/* Os itens ficam dentro do pedido */}
+                        <Route path="/pedidos/:id/itens" element={<DetalhePedido />} />
+                        <Route path="/pedidos/:id/itens/novo" element={<FormItemPedido />} />
+                        <Route path="/pedidos/:id/itens/:idItem/editar" element={<FormItemPedido />} />
                     </Route>
 
                     {/* Qualquer endereço que não existe */}

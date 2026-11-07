@@ -61,3 +61,37 @@ export function validarSenhaObrigatoria(senha: string): string {
 export function validarConfirmacao(senha: string, confirmacao: string): string {
     return senha === confirmacao ? "" : "As senhas não conferem.";
 }
+
+// ===== Validadores dos CRUDs (cada um devolve "" se está OK, ou a mensagem de erro) =====
+
+// Campo obrigatório: não pode ficar vazio (nem só com espaços)
+export function validarObrigatorio(valor: string, rotulo: string): string {
+    return valor.trim() === "" ? `Preencha o campo ${rotulo}.` : "";
+}
+
+// Tamanho do texto (os mesmos limites do back-end e das colunas do banco)
+export function validarTamanho(valor: string, rotulo: string, minimo: number, maximo: number): string {
+    const tamanho = valor.trim().length;
+    if (tamanho < minimo) return `${rotulo} deve ter pelo menos ${minimo} caracteres.`;
+    if (tamanho > maximo) return `${rotulo} deve ter no máximo ${maximo} caracteres.`;
+    return "";
+}
+
+// Preço digitado: aceita "12,50" ou "12.50", maior que zero, até 2 casas decimais e no máximo 99.999,99
+export function validarPrecoTexto(texto: string): string {
+    const limpo = texto.trim().replace(",", ".");
+    if (!/^\d+(\.\d{1,2})?$/.test(limpo)) return "Informe um preço válido, com até 2 casas decimais (ex: 12,50).";
+    const preco = Number(limpo);
+    if (preco <= 0) return "O preço precisa ser maior que zero.";
+    if (preco > 99999.99) return "O preço máximo é 99.999,99.";
+    return "";
+}
+
+// Quantidade de itens: número inteiro de 1 a 999
+export function validarQuantidadeTexto(texto: string): string {
+    const limpo = texto.trim();
+    if (!/^\d+$/.test(limpo)) return "Informe um número inteiro (ex: 2).";
+    const quantidade = Number(limpo);
+    if (quantidade < 1 || quantidade > 999) return "A quantidade deve ser de 1 a 999.";
+    return "";
+}

@@ -277,3 +277,270 @@ button:disabled {
     background: #f1ebe2;
     cursor: not-allowed;
 }
+
+/* ===== CRUDs: listas, tabelas, botões e etiquetas (visual básico; o acabamento fica pro final) ===== */
+
+/* Link com cara de botão (ex: "Nova categoria") */
+.botao,
+.botao-pequeno {
+    display: inline-block;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    background: var(--cafe);
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.botao:hover,
+.botao-pequeno:hover {
+    color: #ffffff;
+    background: var(--cafe-escuro);
+}
+
+/* Botões dentro das tabelas: menores e NÃO ocupam a largura toda (o "button" padrão ocupa) */
+.botao-pequeno {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+button.botao-pequeno {
+    width: auto;
+}
+
+.botao-secundario {
+    color: var(--cafe-escuro);
+    background: #efe4d3;
+}
+
+.botao-secundario:hover {
+    color: var(--cafe-escuro);
+    background: #e4d4bc;
+}
+
+.botao-perigo {
+    background: var(--destaque);
+}
+
+.botao-perigo:hover {
+    background: #962d22;
+}
+
+/* Barra de cima da lista: título + botão "Novo" */
+.barra-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.barra-lista h1,
+.barra-lista h2 {
+    margin: 0;
+    text-align: left;
+}
+
+.lista-embutida {
+    margin-top: 32px;
+}
+
+.estado-lista {
+    padding: 24px;
+    text-align: center;
+    color: var(--texto-suave);
+    background: var(--superficie);
+    border-radius: 14px;
+}
+
+/* Tabela */
+.tabela-rolagem {
+    overflow-x: auto;
+    background: var(--superficie);
+    border-radius: 14px;
+    box-shadow: var(--sombra);
+}
+
+.atualizando {
+    opacity: 0.6;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--borda);
+}
+
+.tabela th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-suave);
+}
+
+.tabela tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tabela .numero {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.coluna-acoes {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.acoes,
+.confirmacao {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.confirmacao > span {
+    font-size: 0.9rem;
+    white-space: normal;
+}
+
+/* Paginação */
+.paginacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+    color: var(--texto-suave);
+}
+
+.paginacao button {
+    width: auto;
+    padding: 8px 16px;
+}
+
+/* Caixa de seleção (mesmo visual do campo de texto) */
+.campo select {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 1rem;
+    color: var(--texto);
+    background: #fffdf9;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+}
+
+.campo select:focus {
+    outline: 3px solid rgba(139, 90, 43, 0.25);
+    border-color: var(--cafe);
+}
+
+.campo select[aria-invalid="true"] {
+    border-color: var(--destaque);
+}
+
+.campo select:disabled {
+    color: var(--texto-suave);
+    background: #f1ebe2;
+    cursor: not-allowed;
+}
+
+/* Botões do formulário (Cadastrar + Cancelar lado a lado) */
+.botoes-form {
+    display: flex;
+    gap: 12px;
+}
+
+.botoes-form button,
+.botoes-form .botao {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+}
+
+/* Etiquetas de status do pedido */
+.etiqueta {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 999px;
+}
+
+.etiqueta-aberto {
+    color: #8a5a00;
+    background: #fdf1d3;
+}
+
+.etiqueta-pago {
+    color: #1e6b3a;
+    background: #e8f5ec;
+}
+
+.etiqueta-cancelado {
+    color: #a93226;
+    background: #fdecea;
+}
+
+/* Cartão com os dados do pedido */
+.cartao-pedido {
+    padding: 20px;
+    background: var(--superficie);
+    border-radius: 16px;
+    box-shadow: var(--sombra);
+}
+
+.cartao-pedido dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 0;
+}
+
+.cartao-pedido dt {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-suave);
+}
+
+.cartao-pedido dd {
+    margin: 4px 0 0;
+    font-size: 1.1rem;
+}
+
+.acoes-pedido {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--borda);
+}
+
+/* Filtro do painel */
+.filtro-periodo {
+    max-width: 240px;
+    margin: 0 auto 16px;
+}
+
+/* Telas com formulário dentro de <main> não precisam do padding grande de cima da tabela */
+main > p > a {
+    font-weight: 600;
+}

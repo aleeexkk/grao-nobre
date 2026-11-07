@@ -25,6 +25,15 @@ export default function CabecalhoLogado() {
                 <NavLink to="/dashboard" className={classeDoLink}>
                     Painel
                 </NavLink>
+                <NavLink to="/pedidos" className={classeDoLink}>
+                    Pedidos
+                </NavLink>
+                <NavLink to="/produtos" className={classeDoLink}>
+                    Produtos
+                </NavLink>
+                <NavLink to="/categorias" className={classeDoLink}>
+                    Categorias
+                </NavLink>
                 <NavLink to="/perfil" className={classeDoLink}>
                     Meu perfil
                 </NavLink>

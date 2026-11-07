@@ -26,3 +26,16 @@ export function limparToken(): void {
         // sem localStorage: nada pra limpar
     }
 }
+
+// Quando o token vence no meio do uso (2h), a API responde 401. Quem guarda "quem está logado"
+// (o AuthProvider) se registra aqui pra ser avisado e mandar a pessoa de volta pro login.
+let aoSessaoExpirar: (() => void) | null = null;
+
+export function definirAoSessaoExpirar(funcao: (() => void) | null): void {
+    aoSessaoExpirar = funcao;
+}
+
+export function avisarSessaoExpirada(): void {
+    limparToken();
+    if (aoSessaoExpirar !== null) aoSessaoExpirar();
+}

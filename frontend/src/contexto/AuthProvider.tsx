@@ -4,7 +4,7 @@ import { AuthContexto } from "./AuthContexto";
 import type { ValorAuth } from "./AuthContexto";
 import { buscarPerfil, ErroApi, fazerLogin } from "../servicos/api";
 import type { Usuario } from "../servicos/api";
-import { limparToken, lerToken, salvarToken } from "../servicos/sessao";
+import { definirAoSessaoExpirar, limparToken, lerToken, salvarToken } from "../servicos/sessao";
 
 // Componente que "abraça" o site inteiro e guarda quem está logado, pra todas as telas saberem.
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -33,6 +33,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         return () => {
             cancelado = true;
         };
+    }, []);
+
+    // Se o token vencer no meio do uso, a API avisa (401) e aqui esquecemos o usuário: o site volta pro login
+    useEffect(() => {
+        definirAoSessaoExpirar(() => setUsuario(null));
+        return () => definirAoSessaoExpirar(null);
     }, []);
 
     // Login: pede o token pra API, guarda no localStorage e lembra quem entrou

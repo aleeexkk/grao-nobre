@@ -1,4 +1,4 @@
-import type { Venda } from "../dados/vendas";
+import type { Venda } from "./tipos";
 
 // Formatos dos resultados
 export interface FaturamentoDia {
@@ -77,9 +77,16 @@ export function faturamentoTotal(vendas: Venda[]): number {
     return somar(vendas.map(valorDaVenda));
 }
 
-// Valor médio de cada venda
+// Quantos pedidos (pagos) existem nas vendas. Cada pedido tem vários itens (várias linhas de venda)
+export function quantidadePedidos(vendas: Venda[]): number {
+    return new Set(vendas.map((v) => v.idPedido)).size;
+}
+
+// Valor médio de cada PEDIDO (o "ticket médio"): soma os itens de cada pedido e tira a média entre os pedidos
 export function ticketMedio(vendas: Venda[]): number {
-    return media(vendas.map(valorDaVenda));
+    const porPedido = agruparPor(vendas, (v) => String(v.idPedido));
+    const totaisDosPedidos = [...porPedido.values()].map((itens) => somar(itens.map(valorDaVenda)));
+    return media(totaisDosPedidos);
 }
 
 // Série temporal: quanto a cafeteria faturou em cada dia
@@ -102,11 +109,16 @@ export function rankingProdutos(vendas: Venda[]): ItemRanking[] {
         .sort((a, b) => b.unidades - a.unidades);
 }
 
-// Quantas unidades saem em cada hora (das 7h às 19h): mostra o horário de pico
+// Quantas unidades saem em cada hora: mostra o horário de pico.
+// Mostra pelo menos o horário comercial (7h às 19h) e aumenta o intervalo se tiver venda fora dele.
 export function vendasPorHora(vendas: Venda[]): VendasHora[] {
     const porHora = agruparPor(vendas, (v) => String(v.hora));
+    const horas = vendas.map((v) => v.hora);
+    const primeira = Math.min(7, ...horas);
+    const ultima = Math.max(19, ...horas);
+
     const resultado: VendasHora[] = [];
-    for (let hora = 7; hora <= 19; hora++) {
+    for (let hora = primeira; hora <= ultima; hora++) {
         const lista = porHora.get(String(hora)) ?? [];
         resultado.push({ hora, unidades: somar(lista.map((v) => v.quantidade)) });
     }
@@ -115,14 +127,18 @@ export function vendasPorHora(vendas: Venda[]): VendasHora[] {
 
 // ---------- Dispersão e regressão ----------
 
-// Um ponto por produto: o preço dele e quantas unidades vendeu no mês
+// Um ponto por produto: o preço dele e quantas unidades vendeu no período
 export function precoVersusUnidades(vendas: Venda[]): PontoPrecoQuantidade[] {
     const porProduto = agruparPor(vendas, (v) => v.produto);
-    return [...porProduto.entries()].map(([produto, lista]) => ({
-        produto,
-        preco: lista[0].valorUnitario, // o preço é o mesmo em todas as vendas do produto
-        unidades: somar(lista.map((v) => v.quantidade)),
-    }));
+    return [...porProduto.entries()].map(([produto, lista]) => {
+        // O preço pode ter mudado no período: usa o da venda mais recente (as datas "2026-11-07" se comparam como texto)
+        const maisRecente = lista.reduce((atual, venda) => (venda.data >= atual.data ? venda : atual));
+        return {
+            produto,
+            preco: maisRecente.valorUnitario,
+            unidades: somar(lista.map((v) => v.quantidade)),
+        };
+    });
 }
 
 // Regressão linear simples (método dos mínimos quadrados): y = intercepto + inclinação * x
