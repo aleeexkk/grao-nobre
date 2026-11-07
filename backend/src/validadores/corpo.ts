@@ -1,4 +1,5 @@
 import { ErroValidacao } from "../erros/ErroValidacao";
+import type { Filtros } from "../tipos/Filtros";
 
 // Confere que o corpo da requisição é um objeto e que CADA campo pedido existe e é texto.
 // "Generics" (<C extends string>): a função serve pra qualquer lista de campos e devolve
@@ -39,7 +40,6 @@ export function lerId(valor: unknown): number {
 
     return id;
 }
-
 
 // Lê um campo de texto OPCIONAL do corpo: se não vier (ou vier null), devolve null.
 // Se vier algo que não é texto (ex: número), é erro 400.
@@ -87,4 +87,57 @@ export function lerPaginacao(consulta: unknown): { pagina: number; limite: numbe
     }
 
     return { pagina, limite };
+}
+
+// Lê um campo NUMÉRICO do corpo. Número de verdade (12.5), não texto ("12.5").
+export function lerNumero(corpo: unknown, campo: string, mensagem: string): number {
+    if (typeof corpo !== "object" || corpo === null) {
+        throw new ErroValidacao(mensagem);
+    }
+
+    const valor = (corpo as Record<string, unknown>)[campo];
+    if (typeof valor !== "number" || !Number.isFinite(valor)) {
+        throw new ErroValidacao(mensagem);
+    }
+    return valor;
+}
+
+// Lê os filtros da URL (ex: ?idPedido=5). Só olha os nomes que a rota aceita (a lista "nomes");
+// qualquer outro parâmetro é ignorado. Cada filtro precisa ser um número inteiro positivo.
+export function lerFiltros(consulta: unknown, nomes: readonly string[]): Filtros {
+    const origem = (typeof consulta === "object" && consulta !== null ? consulta : {}) as Record<string, unknown>;
+    const filtros: Record<string, number> = {};
+
+    for (const nome of nomes) {
+        const valor = origem[nome];
+        if (valor === undefined) continue; // filtro é opcional
+
+        if (typeof valor !== "string" || !/^\d+$/.test(valor) || !Number.isSafeInteger(Number(valor)) || Number(valor) < 1) {
+            throw new ErroValidacao(`Filtro inválido: "${nome}" precisa ser um número inteiro positivo.`);
+        }
+        filtros[nome] = Number(valor);
+    }
+
+    return filtros;
+}
+
+const DIAS_PADRAO = 30; // sem pedir nada, as estatísticas olham os últimos 30 dias
+const DIAS_MAXIMO = 365;
+
+// Lê "?dias=30" (quantos dias pra trás a estatística olha). Opcional: sem nada, vale 30.
+export function lerDias(consulta: unknown): number {
+    const origem = (typeof consulta === "object" && consulta !== null ? consulta : {}) as Record<string, unknown>;
+    const valor = origem.dias;
+    const mensagem = `Período inválido: use um número inteiro de 1 a ${DIAS_MAXIMO} dias.`;
+
+    if (valor === undefined) return DIAS_PADRAO;
+    if (typeof valor !== "string" || !/^\d+$/.test(valor)) {
+        throw new ErroValidacao(mensagem);
+    }
+
+    const dias = Number(valor);
+    if (!Number.isSafeInteger(dias) || dias < 1 || dias > DIAS_MAXIMO) {
+        throw new ErroValidacao(mensagem);
+    }
+    return dias;
 }

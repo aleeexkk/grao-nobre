@@ -1,3 +1,4 @@
+import type { Filtros } from "../tipos/Filtros";
 import type { Pagina } from "../tipos/Pagina";
 
 // Contrato GENÉRICO de um CRUD (Create, Read, Update, Delete).
@@ -8,8 +9,9 @@ export interface IRepositorioCrud<TEntidade, TRegistro> {
     // Create: salva e devolve o registro já com o id que o banco gerou
     inserir(entidade: TEntidade): Promise<TRegistro>;
 
-    // Read: lista com paginação (pagina começa em 1)
-    listar(pagina: number, limite: number): Promise<Pagina<TRegistro>>;
+    // Read: lista com paginação (pagina começa em 1). Os filtros são opcionais
+    // (ex: só os itens de um pedido) e cada repositório decide quais aceita.
+    listar(pagina: number, limite: number, filtros?: Filtros): Promise<Pagina<TRegistro>>;
 
     // Read: busca um só. Devolve null se não existir
     buscarPorId(id: number): Promise<TRegistro | null>;

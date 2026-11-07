@@ -1,0 +1,5 @@
+{
+  // Configuração só para GERAR o código final (npm run build): igual à normal, mas sem os arquivos de teste
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts", "src/testes"]
+}

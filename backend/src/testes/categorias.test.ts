@@ -2,12 +2,9 @@ import { after, before, describe, test } from "node:test";
 import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
 import { criarApp } from "../app";
-import { UsuarioServico } from "../servicos/UsuarioServico";
-import { CategoriaServico } from "../servicos/CategoriaServico";
-import { AutenticacaoServico } from "../servicos/AutenticacaoServico";
 import { TokenServico } from "../servicos/TokenServico";
 import { UsuarioRepositorioMemoria } from "./UsuarioRepositorioMemoria";
-import { CategoriaRepositorioMemoria } from "./CategoriaRepositorioMemoria";
+import { criarDependenciasDeTeste } from "./dependenciasDeTeste";
 
 const SENHA = "Cafe@2026x";
 const SEGREDO = "segredo-de-teste-com-mais-de-16-caracteres";
@@ -35,12 +32,7 @@ interface Resposta<T> {
 async function iniciar() {
     const tokens = new TokenServico(SEGREDO, 60);
     const usuarios = new UsuarioRepositorioMemoria();
-    const app = criarApp({
-        usuarioServico: new UsuarioServico(usuarios),
-        categoriaServico: new CategoriaServico(new CategoriaRepositorioMemoria()),
-        autenticacaoServico: new AutenticacaoServico(usuarios, tokens),
-        tokenServico: tokens,
-    });
+    const app = criarApp(criarDependenciasDeTeste(usuarios, tokens));
     const servidor = app.listen(0); // porta 0 = o sistema escolhe uma livre
     await new Promise<void>((pronto) => servidor.once("listening", () => pronto()));
     const base = `http://127.0.0.1:${(servidor.address() as AddressInfo).port}`;

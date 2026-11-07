@@ -74,7 +74,6 @@ export function validarNome(nome: string): string {
 
     return limpo;
 }
-
 // Valida um texto obrigatório com tamanho mínimo e máximo.
 // "campo" é só o nome que aparece na mensagem de erro (ex: "Nome").
 export function validarTextoObrigatorio(
@@ -108,4 +107,46 @@ export function validarTextoOpcional(
     }
 
     return limpo;
+}
+
+// Valida o preço: maior que zero, no máximo 2 casas decimais (centavos) e até 99999,99
+export function validarPreco(preco: number): number {
+    const centavos = Math.round(preco * 100); // conta em centavos pra fugir dos erros de arredondamento do computador
+
+    if (!Number.isFinite(preco) || preco <= 0 || Math.abs(centavos / 100 - preco) > 1e-9) {
+        throw new ErroValidacao("Preço inválido: informe um valor maior que zero, com no máximo 2 casas decimais.");
+    }
+    if (preco > 99999.99) {
+        throw new ErroValidacao("Preço inválido: o valor máximo é 99999,99.");
+    }
+
+    return centavos / 100; // devolve já arredondado nos centavos
+}
+
+// Valida um id de outra tabela (ex: a categoria do produto): inteiro positivo.
+// "mensagem" é o texto do erro (muda com o gênero: "Categoria inválida.", "Produto inválido.")
+export function validarIdPositivo(id: number, mensagem: string): number {
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        throw new ErroValidacao(mensagem);
+    }
+    return id;
+}
+
+// Valida uma quantidade de itens: número INTEIRO de 1 a 999 (não existe "meio café" nem "zero cafés")
+export function validarQuantidade(quantidade: number): number {
+    if (!Number.isSafeInteger(quantidade) || quantidade < 1 || quantidade > 999) {
+        throw new ErroValidacao("Quantidade inválida: informe um número inteiro de 1 a 999.");
+    }
+    return quantidade;
+}
+
+// Confere se o texto é UMA das opções permitidas (ex: o status do pedido).
+// Generics: devolve o valor já com o tipo da opção (ex: "aberto" | "pago" | "cancelado"), e não só "string".
+export function validarOpcao<T extends string>(valor: string, opcoes: readonly T[], mensagem: string): T {
+    const limpo = valor.trim().toLowerCase();
+    const encontrada = opcoes.find((opcao) => opcao === limpo);
+    if (encontrada === undefined) {
+        throw new ErroValidacao(mensagem);
+    }
+    return encontrada;
 }

@@ -1,5 +1,6 @@
 import { pool } from "../config/conexao";
 import { ErroConflito } from "../erros/ErroConflito";
+import type { Filtros } from "../tipos/Filtros";
 import type { Pagina } from "../tipos/Pagina";
 import type { IRepositorioCrud } from "./IRepositorioCrud";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
@@ -22,6 +23,26 @@ export abstract class RepositorioMySqlBase<TEntidade, TRegistro, TLinha extends 
     // Como transformar uma linha do banco no registro do sistema
     protected abstract paraRegistro(linha: TLinha): TRegistro;
 
+    // ---- Opcionais: a filha pode trocar se precisar ----
+
+    // De onde as consultas (SELECT) leem os dados. Por padrão é a própria tabela, mas uma filha
+    // pode trocar por um JOIN com outra tabela (ex: produto + categoria)
+    protected get origem(): string {
+        return this.tabela;
+    }
+
+    // Em que ORDEM a listagem sai. Por padrão pelo id (do mais antigo pro mais novo);
+    // uma filha pode trocar (ex: pedidos: os mais recentes primeiro)
+    protected get ordenacao(): string {
+        return this.colunaId;
+    }
+
+    // Quais filtros a listagem aceita: "nome do filtro na URL" -> "coluna do banco".
+    // Por padrão nenhum. Ex: { idPedido: "i.id_pedido" } deixa listar só os itens de um pedido
+    protected get filtrosAceitos(): Readonly<Record<string, string>> {
+        return {};
+    }
+
     // Inserir e atualizar mudam as colunas de cada tabela, então cada filha escreve o seu
     abstract inserir(entidade: TEntidade): Promise<TRegistro>;
     abstract atualizar(id: number, entidade: TEntidade): Promise<TRegistro | null>;
@@ -29,17 +50,31 @@ export abstract class RepositorioMySqlBase<TEntidade, TRegistro, TLinha extends 
     // ---- O que já vem PRONTO pra todas as filhas (escrito uma vez só) ----
 
     // Lista com paginação. Ex: pagina 2, limite 10 -> pula os 10 primeiros e traz os 10 seguintes
-    async listar(pagina: number, limite: number): Promise<Pagina<TRegistro>> {
+    async listar(pagina: number, limite: number, filtros: Filtros = {}): Promise<Pagina<TRegistro>> {
         const deslocamento = (pagina - 1) * limite; // quantos itens "pular"
 
+        // Monta o WHERE só com os filtros que ESTA classe aceita (as colunas são escritas por nós;
+        // os valores entram pelos "?", então não tem como injetar SQL)
+        const condicoes: string[] = [];
+        const valores: number[] = [];
+        for (const [nome, coluna] of Object.entries(this.filtrosAceitos)) {
+            const valor: number | undefined = filtros[nome];
+            if (valor !== undefined) {
+                condicoes.push(`${coluna} = ?`);
+                valores.push(valor);
+            }
+        }
+        const where = condicoes.length > 0 ? ` WHERE ${condicoes.join(" AND ")}` : "";
+
         const [linhas] = await pool.query<TLinha[]>(
-            `SELECT ${this.colunas} FROM ${this.tabela} ORDER BY ${this.colunaId} LIMIT ? OFFSET ?`,
-            [limite, deslocamento]
+            `SELECT ${this.colunas} FROM ${this.origem}${where} ORDER BY ${this.ordenacao} LIMIT ? OFFSET ?`,
+            [...valores, limite, deslocamento]
         );
 
-        // Conta quantos existem no total (pra saber quantas páginas são)
+        // Conta quantos existem no total (pra saber quantas páginas são), respeitando os mesmos filtros
         const [contagem] = await pool.query<RowDataPacket[]>(
-            `SELECT COUNT(*) AS total FROM ${this.tabela}`
+            `SELECT COUNT(*) AS total FROM ${this.origem}${where}`,
+            valores
         );
         const total = Number(contagem[0]?.total ?? 0);
 
@@ -55,7 +90,7 @@ export abstract class RepositorioMySqlBase<TEntidade, TRegistro, TLinha extends 
     // Busca um pelo id. Devolve null se não existir
     async buscarPorId(id: number): Promise<TRegistro | null> {
         const [linhas] = await pool.execute<TLinha[]>(
-            `SELECT ${this.colunas} FROM ${this.tabela} WHERE ${this.colunaId} = ?`,
+            `SELECT ${this.colunas} FROM ${this.origem} WHERE ${this.colunaId} = ?`,
             [id]
         );
         const primeira = linhas[0];

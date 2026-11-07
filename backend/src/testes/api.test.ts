@@ -3,12 +3,9 @@ import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { criarApp } from "../app";
-import { UsuarioServico } from "../servicos/UsuarioServico";
-import { CategoriaServico } from "../servicos/CategoriaServico";
-import { AutenticacaoServico } from "../servicos/AutenticacaoServico";
 import { TokenServico } from "../servicos/TokenServico";
 import { UsuarioRepositorioMemoria } from "./UsuarioRepositorioMemoria";
-import { CategoriaRepositorioMemoria } from "./CategoriaRepositorioMemoria";
+import { criarDependenciasDeTeste } from "./dependenciasDeTeste";
 
 // Dois CPFs válidos de exemplo e uma senha forte
 const CPF_A = "529.982.247-25";
@@ -50,12 +47,7 @@ describe("API de usuários (cadastro, login e edição)", () => {
     }
 
     before(async () => {
-        const app = criarApp({
-            usuarioServico: new UsuarioServico(repositorio),
-            categoriaServico: new CategoriaServico(new CategoriaRepositorioMemoria()),
-            autenticacaoServico: new AutenticacaoServico(repositorio, tokens),
-            tokenServico: tokens,
-        });
+        const app = criarApp(criarDependenciasDeTeste(repositorio, tokens));
         servidor = app.listen(0); // porta 0 = o sistema escolhe uma livre
         await new Promise<void>((pronto) => servidor.once("listening", () => pronto()));
         base = `http://127.0.0.1:${(servidor.address() as AddressInfo).port}`;
