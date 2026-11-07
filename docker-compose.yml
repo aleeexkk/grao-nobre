@@ -1,0 +1,59 @@
+# Sobe o sistema inteiro com um comando:  docker compose up --build
+#   banco    -> MariaDB (cria as tabelas sozinho na primeira vez, usando banco/grao_nobre.sql)
+#   backend  -> API em http://localhost:3000
+#   frontend -> site em http://localhost:8080
+# As senhas NÃO ficam aqui: vêm do arquivo .env (copie o .env.example e preencha).
+
+name: grao-nobre
+
+services:
+  banco:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: grao_nobre
+      MARIADB_USER: grao_nobre
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Crie o arquivo .env (copie o .env.example) e preencha DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes" # a senha do root fica aleatória (a aplicação usa o usuário grao_nobre)
+    volumes:
+      - dados-banco:/var/lib/mysql # os dados sobrevivem quando os containers são desligados
+      # Tudo que estiver nesta pasta roda na PRIMEIRA vez que o banco é criado
+      - ./banco/grao_nobre.sql:/docker-entrypoint-initdb.d/01-grao_nobre.sql:ro
+    ports:
+      - "127.0.0.1:3307:3306" # porta 3307 no seu PC (pra não bater com o MySQL do XAMPP, que usa a 3306)
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: banco # dentro do Docker, o banco é acessado pelo nome do serviço
+      DB_PORT: "3306"
+      DB_USER: grao_nobre
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: grao_nobre
+      PORT: "3000"
+      JWT_SECRET: ${JWT_SECRET:?Crie o arquivo .env (copie o .env.example) e preencha JWT_SECRET}
+    depends_on:
+      banco:
+        condition: service_healthy # só inicia quando o banco já terminou de ligar
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000 # endereço da API, visto pelo navegador
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  dados-banco:
