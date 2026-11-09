@@ -66,6 +66,9 @@ No front, a mesma ideia: `servicos/crud.ts` (`criarClienteCrud`) e os componente
 - Nunca ler, mostrar, copiar, resumir nem commitar `.env` (nem `backend/.env`). Eles têm senha do banco e `JWT_SECRET`.
   O arquivo `.claude/settings.json` bloqueia a leitura pelas ferramentas de arquivo, e este documento vale também
   para comandos de terminal (`cat .env`, `type .env`, `env`, `printenv`...).
+- O `.claude/settings.json` tem 3 níveis: `deny` (proibido: ler/editar `.env`, `push --force`, `reset --hard`, `rm -rf`),
+  `ask` (o agente precisa pedir antes: `git commit`, `git push`, `npm install`, cliente `mysql`, `docker compose down`)
+  e o resto liberado. É uma trava extra: as regras de comando são frágeis, então a regra daqui continua valendo.
 - Só `.env.example` (sem valores reais) pode ser lido e versionado. Variável nova entra nele, sem valor.
 - Nunca colocar senha, token ou chave dentro do código, de testes, de logs ou de mensagens de commit.
 
