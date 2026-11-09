@@ -1,79 +1,195 @@
-/* ===== Paleta e configurações gerais (tema cafeteria) ===== */
+/* ==========================================================================
+   Grão Nobre — estilos do site inteiro (um arquivo só, organizado em blocos)
+
+   COMO MEXER NO VISUAL:
+   - Cores, fontes e sombra ficam todas no bloco ":root" logo abaixo.
+     Trocou um valor ali, o site inteiro muda junto.
+   - O marrom --torra (#8b5a2b) é o mesmo usado nas barras dos gráficos (nos arquivos
+     components/graficos). Se mudar um, mude o outro.
+
+   BLOCOS:
+   1. Cores e fontes        6. Mensagens (erro/sucesso)   11. Comanda (cartão do pedido)
+   2. Base da página        7. Cabeçalho                  12. Painel (métricas e gráficos)
+   3. Telas e títulos       8. Listas e tabelas           13. Telas pequenas (celular)
+   4. Marca (grão de café)  9. Paginação                  14. Movimento reduzido
+   5. Formulários e botões  10. Etiquetas de status
+   ========================================================================== */
+
+/* ===== 1. Cores e fontes ===== */
 :root {
     color-scheme: light;
-    --fundo: #f7f1e8; /* creme */
-    --superficie: #ffffff; /* fundo dos cartões */
-    --texto: #3a2a1f; /* marrom bem escuro */
-    --texto-suave: #7a6556; /* marrom acinzentado */
-    --cafe: #8b5a2b; /* marrom principal (igual ao das barras dos gráficos) */
-    --cafe-escuro: #5c3a1a;
-    --destaque: #c0392b; /* vermelho dos erros e destaques */
-    --borda: #e6d9c8;
-    --sombra: 0 4px 14px rgba(58, 42, 31, 0.08);
 
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.5;
+    /* Marrons da cafeteria */
+    --espresso: #2e1f16; /* quase preto, puxado pro marrom: cabeçalho, títulos e textos */
+    --torra: #8b5a2b; /* cor da marca: botões, links e barras dos gráficos */
+    --torra-escura: #5c3a1a; /* o mesmo marrom, mais escuro (passar o mouse) */
+    --crema: #e8c48b; /* dourado claro: detalhes sobre o fundo escuro */
+
+    /* Fundos */
+    --farinha: #f6f0e6; /* fundo da página */
+    --papel: #fffdf9; /* fundo de cartões, tabelas e formulários */
+
+    /* Cores de estado */
+    --folha: #2f6b45; /* verde: pago e sucesso */
+    --tomate: #b3402e; /* vermelho: erro, excluir e cancelar */
+    --ambar: #8a5a00; /* amarelo queimado: pedido aberto */
+
+    /* Textos e linhas */
+    --texto: #2e1f16;
+    --texto-suave: #6f5a49; /* textos de apoio (contraste de 5,7:1 sobre a farinha) */
+    --borda: #e4d7c4;
+    --borda-forte: #cdb99f;
+
+    --sombra: 0 1px 2px rgba(46, 31, 22, 0.06), 0 10px 24px -14px rgba(46, 31, 22, 0.3);
+
+    /* Fontes do próprio computador (o site funciona até sem internet):
+       títulos com serifa (Palatino no Windows e no Mac) e textos com a fonte do sistema */
+    --fonte-titulo: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, serif;
+    --fonte-texto: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* O grão de café, desenhado em SVG dentro do próprio CSS (nenhuma imagem extra pra baixar) */
+    --grao-sobre-claro: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(35 12 12)'%3E%3Cellipse cx='12' cy='12' rx='6.5' ry='10' fill='%238b5a2b'/%3E%3Cpath d='M12 2.4c-2.6 3.2 2.6 6.4 0 9.6s2.6 6.4 0 9.6' fill='none' stroke='%23f6f0e6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+    --grao-sobre-escuro: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(35 12 12)'%3E%3Cellipse cx='12' cy='12' rx='6.5' ry='10' fill='%23e8c48b'/%3E%3Cpath d='M12 2.4c-2.6 3.2 2.6 6.4 0 9.6s2.6 6.4 0 9.6' fill='none' stroke='%232e1f16' stroke-width='1.5' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+
+    font-family: var(--fonte-texto);
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
 }
 
+/* ===== 2. Base da página ===== */
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background: var(--fundo);
     color: var(--texto);
+    background: var(--farinha);
 }
 
-/* ===== Estrutura das páginas ===== */
-main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px 64px;
-}
-
-h1 {
-    margin: 0 0 8px;
-    text-align: center;
-    font-size: 2.2rem;
-    color: var(--cafe-escuro);
-}
-
-h2 {
-    margin: 0 0 6px;
-    font-size: 1.25rem;
-    color: var(--cafe-escuro);
-}
-
-main > p {
-    margin: 0 0 24px;
-    text-align: center;
-    color: var(--texto-suave);
+::selection {
+    background: var(--crema);
 }
 
 a {
-    color: var(--cafe);
+    color: var(--torra);
     font-weight: 600;
 }
 
 a:hover {
-    color: var(--cafe-escuro);
+    color: var(--torra-escura);
 }
 
-/* Links soltos no fim da página (ex: "Já tenho conta") */
+/* Foco visível: quem navega pelo teclado (Tab) sempre vê onde está */
+:focus-visible {
+    outline: 3px solid rgba(139, 90, 43, 0.45);
+    outline-offset: 2px;
+}
+
+/* ===== 3. Telas e títulos ===== */
+h1,
+h2 {
+    font-family: var(--fonte-titulo);
+    color: var(--espresso);
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    margin: 0 0 6px;
+    font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.3rem);
+    line-height: 1.15;
+}
+
+h2 {
+    margin: 0 0 4px;
+    font-size: 1.35rem;
+    line-height: 1.25;
+}
+
+/* Toda tela fica dentro de um <main>: uma coluna centralizada */
+main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 36px 24px 72px;
+}
+
+main > p {
+    margin: 0 0 24px;
+    color: var(--texto-suave);
+}
+
+/* O link "← Voltar para os pedidos" fica colado no título */
+.cabecalho ~ main > p:first-child {
+    margin-bottom: 8px;
+}
+
 main > a {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
+    display: inline-block;
+    margin-top: 16px;
 }
 
-/* ===== Formulários (cadastro) ===== */
+/* Telas de formulário (cadastrar, editar, perfil): coluna mais estreita */
+.cabecalho ~ main:has(> form) {
+    max-width: 580px;
+}
+
+/* Login e cadastro: não têm cabeçalho, então o <main> é o primeiro item da página.
+   Ficam centralizados, com a marca da cafeteria em cima */
+#root > main:first-child {
+    max-width: 480px;
+    padding-top: 40px;
+    text-align: center;
+}
+
+#root > main:first-child::before {
+    content: "Grão Nobre";
+    display: block;
+    margin-bottom: 20px;
+    padding-top: 52px;
+    font-family: var(--fonte-titulo);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--espresso);
+    background: var(--grao-sobre-claro) no-repeat top center / 40px 40px;
+}
+
+/* Quadro vazio ("Nenhum produto cadastrado ainda") e avisos de carregamento */
+.estado-lista {
+    margin: 0;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--texto-suave);
+    border: 1px dashed var(--borda-forte);
+    border-radius: 12px;
+}
+
+/* ===== 4. Marca (grão de café no cabeçalho) ===== */
+.cabecalho-marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--fonte-titulo);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--farinha);
+}
+
+.cabecalho-marca::before {
+    content: "";
+    width: 26px;
+    height: 26px;
+    background: var(--grao-sobre-escuro) no-repeat center / contain;
+}
+
+/* ===== 5. Formulários e botões ===== */
 form {
-    max-width: 440px;
-    margin: 24px auto 0;
+    margin: 20px 0 0;
     padding: 28px;
-    background: var(--superficie);
-    border-radius: 16px;
+    text-align: left;
+    background: var(--papel);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
     box-shadow: var(--sombra);
 }
 
@@ -81,292 +197,289 @@ form {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .campo label {
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--cafe-escuro);
+    color: var(--espresso);
 }
 
-.campo input {
+.campo input,
+.campo select {
     width: 100%;
     padding: 11px 12px;
-    font-size: 1rem;
+    font: inherit;
     color: var(--texto);
-    background: #fffdf9;
-    border: 1px solid var(--borda);
-    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid var(--borda-forte);
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.campo input:focus {
+.campo input::placeholder {
+    color: #a8937f;
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: var(--torra);
     outline: 3px solid rgba(139, 90, 43, 0.25);
-    border-color: var(--cafe);
+    outline-offset: 0;
 }
 
-/* Campo com erro: borda vermelha */
-.campo input[aria-invalid="true"] {
-    border-color: var(--destaque);
+/* Campo com erro: borda vermelha e fundo levemente rosado */
+.campo input[aria-invalid="true"],
+.campo select[aria-invalid="true"] {
+    background: #fff8f6;
+    border-color: var(--tomate);
 }
 
-.campo-erro {
-    font-size: 0.85rem;
-    color: var(--destaque);
-}
-
-/* Erro que veio do servidor (ex: "E-mail já cadastrado.") */
-.erro-api {
-    margin: 0 0 16px;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    color: #a93226;
-    background: #fdecea;
-    border-radius: 10px;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-    background: var(--cafe);
-    border: 0;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: var(--cafe-escuro);
-}
-
-button:disabled {
-    opacity: 0.6;
+/* Campo que não pode ser editado (ex: e-mail no perfil) */
+.campo input:disabled,
+.campo select:disabled {
+    color: var(--texto-suave);
+    background: #f1ebe2;
     cursor: not-allowed;
 }
 
-/* ===== Painel: cartões de métricas ===== */
-.cartoes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    margin: 24px 0;
+.campo-erro {
+    font-size: 0.875rem;
+    color: var(--tomate);
 }
 
-.cartao-metrica {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 18px;
-    background: var(--superficie);
-    border-left: 5px solid var(--cafe);
-    border-radius: 14px;
-    box-shadow: var(--sombra);
-}
-
-.cartao-titulo {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+/* Texto pequeno de ajuda embaixo do campo */
+.campo-ajuda {
+    font-size: 0.875rem;
     color: var(--texto-suave);
 }
 
-.cartao-valor {
-    font-size: 1.7rem;
-    color: var(--cafe-escuro);
+form > .campo-ajuda {
+    margin: 0 0 18px;
 }
 
-.cartao-descricao {
-    color: var(--texto-suave);
-}
-
-/* ===== Painel: cartões dos gráficos ===== */
-.cartao-grafico {
-    margin: 24px 0;
-    padding: 24px;
-    background: var(--superficie);
-    border-radius: 16px;
-    box-shadow: var(--sombra);
-}
-
-.cartao-grafico p {
-    margin: 0 0 16px;
+/* Botões: o <button> e os links com classe "botao" têm o mesmo visual */
+button,
+.botao,
+.botao-pequeno {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font: inherit;
     font-size: 0.95rem;
-    color: var(--texto-suave);
+    font-weight: 600;
+    line-height: 1.2;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    background: var(--torra);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s;
 }
-/* ===== Área logada: cabeçalho ===== */
+
+button:hover,
+.botao:hover,
+.botao-pequeno:hover {
+    color: #ffffff;
+    background: var(--torra-escura);
+}
+
+button:active,
+.botao:active,
+.botao-pequeno:active {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* O botão principal dos formulários de login/cadastro/perfil ocupa a largura toda */
+form > button[type="submit"] {
+    width: 100%;
+    margin-top: 4px;
+    padding: 12px 18px;
+    font-size: 1rem;
+}
+
+/* Botões pequenos (dentro das tabelas e dos cartões) */
+.botao-pequeno {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 7px;
+}
+
+/* Botão discreto: Editar, Cancelar, Voltar */
+.botao-secundario {
+    color: var(--torra-escura);
+    background: #efe3d0;
+}
+
+.botao-secundario:hover {
+    color: var(--torra-escura);
+    background: #e3d2b8;
+}
+
+/* Botão de ação perigosa: Excluir, Cancelar pedido */
+.botao-perigo {
+    background: var(--tomate);
+}
+
+.botao-perigo:hover {
+    background: #8f3122;
+}
+
+/* Cadastrar + Cancelar lado a lado */
+.botoes-form {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.botoes-form button,
+.botoes-form .botao {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+}
+
+/* ===== 6. Mensagens (erro/sucesso) ===== */
+.erro-api,
+.sucesso-api {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border-left: 4px solid;
+    border-radius: 8px;
+}
+
+.erro-api {
+    color: #8f2f21;
+    background: #fbeae6;
+    border-color: var(--tomate);
+}
+
+.sucesso-api {
+    color: #23553a;
+    background: #e6f2e9;
+    border-color: var(--folha);
+}
+
+.erro-api p {
+    margin: 0 0 8px;
+}
+
+/* ===== 7. Cabeçalho (área logada) ===== */
 .cabecalho {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 28px;
-    padding: 14px 24px;
-    color: #ffffff;
-    background: var(--cafe-escuro);
-}
-
-.cabecalho-marca {
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    gap: 10px 36px;
+    /* O espaço dos lados acompanha o <main>, então a marca fica alinhada com o conteúdo */
+    padding: 12px max(24px, calc((100% - 1080px) / 2 + 24px));
+    color: var(--farinha);
+    background: var(--espresso);
 }
 
 .cabecalho nav {
     display: flex;
     flex: 1;
-    gap: 18px;
+    gap: 24px;
 }
 
 .cabecalho nav a {
-    padding: 4px 2px;
-    color: #f0dfc8;
+    padding: 6px 2px;
+    font-weight: 500;
+    color: rgba(246, 240, 230, 0.72);
     text-decoration: none;
     border-bottom: 2px solid transparent;
+    transition: color 0.15s;
 }
 
-.cabecalho nav a:hover,
-.cabecalho nav a.ativo {
+.cabecalho nav a:hover {
     color: #ffffff;
 }
 
 .cabecalho nav a.ativo {
-    border-bottom-color: #e0b27a;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom-color: var(--crema);
 }
 
 .cabecalho-usuario {
     display: flex;
     align-items: center;
     gap: 14px;
+    font-size: 0.95rem;
 }
 
-/* O botão "Sair" é pequeno (o botão padrão do site ocupa a largura toda) */
+/* O "Sair" é um botão só com contorno */
 .cabecalho-usuario button {
-    width: auto;
-    padding: 7px 16px;
+    padding: 6px 16px;
     font-size: 0.9rem;
+    color: var(--crema);
     background: transparent;
-    border: 1px solid #e0b27a;
+    border-color: rgba(232, 196, 139, 0.55);
 }
 
 .cabecalho-usuario button:hover {
-    background: rgba(255, 255, 255, 0.14);
+    color: var(--espresso);
+    background: var(--crema);
 }
 
-/* ===== Mensagens e campos extras ===== */
-
-/* Mensagem de sucesso (ex: "Cadastro realizado!") */
-.sucesso-api {
-    margin: 0 0 16px;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    color: #1e6b3a;
-    background: #e8f5ec;
-    border-radius: 10px;
+.cabecalho :focus-visible {
+    outline-color: var(--crema);
 }
 
-/* Texto pequeno de ajuda embaixo do campo */
-.campo-ajuda {
-    font-size: 0.85rem;
-    color: var(--texto-suave);
-}
+/* ===== 8. Listas e tabelas ===== */
 
-/* Campo que não pode ser editado (ex: e-mail no perfil) */
-.campo input:disabled {
-    color: var(--texto-suave);
-    background: #f1ebe2;
-    cursor: not-allowed;
-}
-
-/* ===== CRUDs: listas, tabelas, botões e etiquetas (visual básico; o acabamento fica pro final) ===== */
-
-/* Link com cara de botão (ex: "Nova categoria") */
-.botao,
-.botao-pequeno {
-    display: inline-block;
-    padding: 10px 16px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #ffffff;
-    text-align: center;
-    text-decoration: none;
-    background: var(--cafe);
-    border: 0;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.botao:hover,
-.botao-pequeno:hover {
-    color: #ffffff;
-    background: var(--cafe-escuro);
-}
-
-/* Botões dentro das tabelas: menores e NÃO ocupam a largura toda (o "button" padrão ocupa) */
-.botao-pequeno {
-    width: auto;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-}
-
-button.botao-pequeno {
-    width: auto;
-}
-
-.botao-secundario {
-    color: var(--cafe-escuro);
-    background: #efe4d3;
-}
-
-.botao-secundario:hover {
-    color: var(--cafe-escuro);
-    background: #e4d4bc;
-}
-
-.botao-perigo {
-    background: var(--destaque);
-}
-
-.botao-perigo:hover {
-    background: #962d22;
-}
-
-/* Barra de cima da lista: título + botão "Novo" */
+/* Linha de cima da lista: título à esquerda, botão "Novo" à direita */
 .barra-lista {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .barra-lista h1,
 .barra-lista h2 {
     margin: 0;
-    text-align: left;
 }
 
+/* Lista dentro de outra tela (itens dentro do pedido) */
 .lista-embutida {
-    margin-top: 32px;
+    margin-top: 40px;
 }
 
-.estado-lista {
-    padding: 24px;
-    text-align: center;
-    color: var(--texto-suave);
-    background: var(--superficie);
-    border-radius: 14px;
-}
-
-/* Tabela */
 .tabela-rolagem {
     overflow-x: auto;
-    background: var(--superficie);
-    border-radius: 14px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
     box-shadow: var(--sombra);
+    transition: opacity 0.15s;
+
+    /* No celular a tabela rola pro lado: uma sombrinha na ponta avisa que ainda tem coluna escondida.
+       As duas primeiras camadas (cor do papel, "local") tapam a sombra quando a rolagem chega no fim */
+    background-color: var(--papel);
+    background-image: linear-gradient(to right, var(--papel), var(--papel)),
+        linear-gradient(to right, var(--papel), var(--papel)),
+        linear-gradient(to right, rgba(46, 31, 22, 0.18), rgba(46, 31, 22, 0)),
+        linear-gradient(to left, rgba(46, 31, 22, 0.18), rgba(46, 31, 22, 0));
+    background-position: left center, right center, left center, right center;
+    background-repeat: no-repeat;
+    background-size: 24px 100%, 24px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
 }
 
+/* Enquanto busca a página nova, a tabela fica meio apagada */
 .atualizando {
     opacity: 0.6;
 }
@@ -374,20 +487,27 @@ button.botao-pequeno {
 .tabela {
     width: 100%;
     border-collapse: collapse;
+    /* Números do mesmo tamanho: os valores em R$ ficam alinhados na coluna */
+    font-variant-numeric: tabular-nums;
 }
 
 .tabela th,
 .tabela td {
-    padding: 12px 14px;
+    padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid var(--borda);
 }
 
 .tabela th {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
     color: var(--texto-suave);
+    background: #faf5ec;
+}
+
+.tabela tbody tr:hover {
+    background: #fbf6ee;
 }
 
 .tabela tbody tr:last-child td {
@@ -413,115 +533,119 @@ button.botao-pequeno {
     gap: 8px;
 }
 
+/* "Excluir o produto X?" pode quebrar em duas linhas */
 .confirmacao > span {
     font-size: 0.9rem;
     white-space: normal;
 }
 
-/* Paginação */
+/* ===== 9. Paginação ===== */
 .paginacao {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    margin-top: 16px;
+    gap: 8px 16px;
+    margin-top: 18px;
+    font-size: 0.95rem;
     color: var(--texto-suave);
 }
 
+/* Anterior/Próxima são botões claros: o foco da tela é a tabela, não eles */
 .paginacao button {
-    width: auto;
     padding: 8px 16px;
+    color: var(--torra-escura);
+    background: var(--papel);
+    border-color: var(--borda-forte);
 }
 
-/* Caixa de seleção (mesmo visual do campo de texto) */
-.campo select {
-    width: 100%;
-    padding: 11px 12px;
-    font-size: 1rem;
-    color: var(--texto);
-    background: #fffdf9;
-    border: 1px solid var(--borda);
-    border-radius: 10px;
+.paginacao button:hover:not(:disabled) {
+    color: var(--torra-escura);
+    background: #efe3d0;
 }
 
-.campo select:focus {
-    outline: 3px solid rgba(139, 90, 43, 0.25);
-    border-color: var(--cafe);
-}
-
-.campo select[aria-invalid="true"] {
-    border-color: var(--destaque);
-}
-
-.campo select:disabled {
-    color: var(--texto-suave);
-    background: #f1ebe2;
-    cursor: not-allowed;
-}
-
-/* Botões do formulário (Cadastrar + Cancelar lado a lado) */
-.botoes-form {
-    display: flex;
-    gap: 12px;
-}
-
-.botoes-form button,
-.botoes-form .botao {
-    flex: 1;
-    padding: 12px;
-    font-size: 1rem;
-}
-
-/* Etiquetas de status do pedido */
+/* ===== 10. Etiquetas de status do pedido ===== */
 .etiqueta {
-    display: inline-block;
-    padding: 2px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 11px 2px 9px;
     font-size: 0.8rem;
-    font-weight: 700;
+    font-weight: 600;
     border-radius: 999px;
 }
 
+/* A bolinha repete a cor do status (o texto também diz, então não depende só da cor) */
+.etiqueta::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
 .etiqueta-aberto {
-    color: #8a5a00;
-    background: #fdf1d3;
+    color: var(--ambar);
+    background: #fbefcf;
 }
 
 .etiqueta-pago {
-    color: #1e6b3a;
-    background: #e8f5ec;
+    color: #23553a;
+    background: #e2f0e6;
 }
 
 .etiqueta-cancelado {
-    color: #a93226;
-    background: #fdecea;
+    color: #8f2f21;
+    background: #fbe6e1;
 }
 
-/* Cartão com os dados do pedido */
+/* ===== 11. Comanda: o cartão com os dados do pedido ===== */
+/* O visual lembra a comanda de papel do balcão: borda de baixo serrilhada e linha pontilhada */
 .cartao-pedido {
-    padding: 20px;
-    background: var(--superficie);
-    border-radius: 16px;
-    box-shadow: var(--sombra);
+    position: relative;
+    margin: 20px 0 22px;
+    padding: 24px 28px 26px;
+    background: var(--papel);
+    border-radius: 10px 10px 0 0;
+    /* filter (e não box-shadow) pra a sombra seguir o serrilhado */
+    filter: drop-shadow(0 6px 10px rgba(46, 31, 22, 0.14));
+}
+
+.cartao-pedido::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 8px;
+    background: linear-gradient(135deg, var(--papel) 4px, transparent 0) 0 0 / 8px 8px,
+        linear-gradient(-135deg, var(--papel) 4px, transparent 0) 0 0 / 8px 8px;
 }
 
 .cartao-pedido dl {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px 24px;
     margin: 0;
 }
 
 .cartao-pedido dt {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    font-size: 0.875rem;
     color: var(--texto-suave);
 }
 
 .cartao-pedido dd {
-    margin: 4px 0 0;
-    font-size: 1.1rem;
+    margin: 2px 0 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+/* O total é o número que importa na comanda: último item da lista, maior e em serifa */
+.cartao-pedido dl > div:last-child dd {
+    font-family: var(--fonte-titulo);
+    font-size: 1.7rem;
+    line-height: 1.2;
+    font-variant-numeric: lining-nums tabular-nums;
 }
 
 .acoes-pedido {
@@ -529,18 +653,215 @@ button.botao-pequeno {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--borda);
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--borda-forte);
 }
 
-/* Filtro do painel */
+/* ===== 12. Painel (métricas e gráficos) ===== */
+
+/* O filtro de período: rótulo e caixa na mesma linha */
 .filtro-periodo {
-    max-width: 240px;
-    margin: 0 auto 16px;
+    margin: 0 0 20px;
 }
 
-/* Telas com formulário dentro de <main> não precisam do padding grande de cima da tabela */
-main > p > a {
+.filtro-periodo .campo {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.filtro-periodo .campo select {
+    width: auto;
+    min-width: 190px;
+}
+
+/* As 6 métricas formam um quadro só: linhas finas separam uma da outra */
+.cartoes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin: 0 0 28px;
+    overflow: hidden;
+    background: var(--borda);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    box-shadow: var(--sombra);
+}
+
+.cartao-metrica {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 22px;
+    background: var(--papel);
+}
+
+.cartao-titulo {
+    font-size: 0.9rem;
     font-weight: 600;
+    color: var(--texto-suave);
+}
+
+.cartao-valor {
+    font-family: var(--fonte-titulo);
+    font-size: 1.75rem;
+    line-height: 1.2;
+    color: var(--espresso);
+    font-variant-numeric: lining-nums tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.cartao-descricao {
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+}
+
+/* O faturamento é o número principal do painel: único cartão escuro, com o valor maior */
+.cartao-metrica:first-child {
+    background: var(--espresso);
+}
+
+.cartao-metrica:first-child .cartao-titulo,
+.cartao-metrica:first-child .cartao-descricao {
+    color: rgba(246, 240, 230, 0.75);
+}
+
+.cartao-metrica:first-child .cartao-valor {
+    font-size: 2.25rem;
+    color: var(--crema);
+}
+
+/* Cada gráfico num cartão de papel */
+.cartao-grafico {
+    margin: 0 0 24px;
+    padding: 24px 24px 12px;
+    background: var(--papel);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    box-shadow: var(--sombra);
+}
+
+.cartao-grafico > p {
+    max-width: 72ch;
+    margin: 0 0 18px;
+    font-size: 0.95rem;
+    color: var(--texto-suave);
+}
+
+/* Acabamento dos gráficos (a biblioteca Recharts desenha SVG; aqui só trocamos as cores) */
+.recharts-wrapper {
+    font-family: var(--fonte-texto);
+}
+
+.recharts-text,
+.recharts-cartesian-axis-tick-value {
+    fill: var(--texto-suave);
+    font-size: 12px;
+}
+
+.recharts-cartesian-grid line {
+    stroke: var(--borda);
+}
+
+.recharts-cartesian-axis-line,
+.recharts-cartesian-axis-tick-line {
+    stroke: var(--borda-forte);
+}
+
+/* Caixinha que aparece ao passar o mouse nas barras e pontos */
+.recharts-default-tooltip {
+    border: 1px solid var(--borda-forte) !important;
+    border-radius: 8px;
+    box-shadow: var(--sombra);
+}
+
+/* Nome do produto ao lado de cada ponto do gráfico de dispersão */
+.rotulo-ponto {
+    font-size: 12px;
+    fill: var(--espresso);
+}
+
+/* ===== 13. Telas pequenas (celular e tablet) ===== */
+@media (max-width: 900px) {
+    .cartoes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    main {
+        padding: 24px 16px 56px;
+    }
+
+    form {
+        padding: 20px 16px;
+    }
+
+    /* Cabeçalho: marca e usuário em cima, menu embaixo (quebra em duas linhas se não couber) */
+    .cabecalho {
+        padding: 10px 16px;
+        gap: 6px 16px;
+    }
+
+    .cabecalho-marca {
+        order: 1;
+    }
+
+    .cabecalho-usuario {
+        order: 2;
+        margin-left: auto;
+    }
+
+    .cabecalho nav {
+        order: 3;
+        flex: 1 0 100%;
+        flex-wrap: wrap;
+        gap: 2px 20px;
+    }
+
+    .filtro-periodo .campo {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .filtro-periodo .campo select {
+        width: 100%;
+    }
+
+    .cartao-grafico {
+        padding: 18px 12px 8px;
+    }
+
+    .cartao-grafico h2,
+    .cartao-grafico > p {
+        padding-inline: 6px;
+    }
+
+    .tabela th,
+    .tabela td {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 520px) {
+    .cartoes {
+        grid-template-columns: 1fr;
+    }
+
+    .botoes-form {
+        flex-direction: column;
+    }
+}
+
+/* ===== 14. Movimento reduzido ===== */
+/* Quem pediu menos animação no sistema não vê as transições */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+    }
 }

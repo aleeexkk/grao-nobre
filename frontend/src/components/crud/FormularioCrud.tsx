@@ -50,7 +50,9 @@ export default function FormularioCrud<V extends Record<string, string>>({
     function erroDoCampo(campo: CampoFormulario<V>): string {
         const valor = valores[campo.nome] ?? "";
         if (campo.obrigatorio === true && valor.trim() === "") {
-            return campo.tipo === "selecao" ? `Selecione ${campo.rotulo.toLowerCase()}.` : `Preencha o campo ${campo.rotulo.toLowerCase()}.`;
+            // Tira o "(R$)" do rótulo antes de usar na frase: "Preço (R$)" vira "preço" (e não "preço (r$)")
+            const nome = campo.rotulo.replace(/\s*\([^)]*\)\s*$/, "").toLowerCase();
+            return campo.tipo === "selecao" ? `Selecione ${nome}.` : `Preencha o campo ${nome}.`;
         }
         // Campo opcional vazio não precisa passar pelas outras regras
         if (valor.trim() === "") return "";

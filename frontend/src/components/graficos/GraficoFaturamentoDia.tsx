@@ -24,7 +24,8 @@ export default function GraficoFaturamentoDia({ dados, mediaDiaria }: GraficoFat
                 <CartesianGrid strokeDasharray="3 3" />
                 {/* tickFormatter muda como o texto do eixo aparece */}
                 <XAxis dataKey="data" tickFormatter={formatarDiaMes} />
-                <YAxis tickFormatter={(valor: number) => `R$ ${valor}`} />
+                {/* width maior: o texto "R$ 1200" não cabia na largura padrão e ficava cortado */}
+                <YAxis width={76} tickFormatter={(valor: number) => `R$ ${valor}`} />
                 <Tooltip
                     formatter={(valor) => formatarMoeda(Number(valor))}
                     labelFormatter={(rotulo) => `Dia ${formatarDiaMes(String(rotulo))}`}

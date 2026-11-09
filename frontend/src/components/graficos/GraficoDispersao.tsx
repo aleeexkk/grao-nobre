@@ -16,6 +16,24 @@ interface GraficoDispersaoProps {
     regressao: ResultadoRegressao; // inclinação e intercepto da reta
 }
 
+// O que o Recharts entrega pra cada rótulo: a posição (x, y) do ponto e o texto (value)
+interface RotuloPontoProps {
+    x?: number | string;
+    y?: number | string;
+    value?: unknown;
+}
+
+// Escreve o nome do produto ao lado do ponto, numa linha só (o rótulo padrão quebrava o nome em
+// várias linhas e os nomes de pontos vizinhos ficavam um em cima do outro)
+function RotuloPonto({ x, y, value }: RotuloPontoProps) {
+    if (x === undefined || y === undefined) return null;
+    return (
+        <text x={Number(x) + 9} y={Number(y) + 4} className="rotulo-ponto">
+            {String(value)}
+        </text>
+    );
+}
+
 // Gráfico de dispersão: cada ponto é um produto (preço x unidades vendidas) + reta de regressão
 export default function GraficoDispersao({ dados, regressao }: GraficoDispersaoProps) {
     // A reta vai do menor ao maior preço (com 1 real de folga nas pontas)
@@ -28,7 +46,8 @@ export default function GraficoDispersao({ dados, regressao }: GraficoDispersaoP
 
     return (
         <ResponsiveContainer width="100%" height={380}>
-            <ScatterChart margin={{ top: 20, right: 30, bottom: 30, left: 10 }}>
+            {/* top maior: o produto mais vendido fica no topo do gráfico e o ponto não pode ser cortado */}
+            <ScatterChart margin={{ top: 32, right: 30, bottom: 30, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                     type="number"
@@ -57,8 +76,8 @@ export default function GraficoDispersao({ dados, regressao }: GraficoDispersaoP
                     ifOverflow="extendDomain"
                 />
                 <Scatter name="Produtos" data={dados} fill="#8b5a2b">
-                    {/* Escreve o nome do produto em cima de cada ponto */}
-                    <LabelList dataKey="produto" position="top" />
+                    {/* Escreve o nome do produto ao lado de cada ponto */}
+                    <LabelList dataKey="produto" content={RotuloPonto} />
                 </Scatter>
             </ScatterChart>
         </ResponsiveContainer>
