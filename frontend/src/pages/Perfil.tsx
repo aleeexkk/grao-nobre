@@ -44,7 +44,7 @@ function FormularioPerfil({ perfil }: { perfil: PerfilUsuario }) {
 
         setEnviando(true);
         try {
-            const atualizado = await atualizarPerfil(perfil.id, { nome, cpf, senha });
+            const atualizado = await atualizarPerfil(perfil.id, { nome, email: perfil.email, cpf, senha });
             // Atualiza o nome que aparece no cabeçalho (o contexto é global)
             atualizarUsuario({ id: atualizado.id, nome: atualizado.nome, email: atualizado.email });
             setNome(atualizado.nome);

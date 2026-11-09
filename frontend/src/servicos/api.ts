@@ -35,9 +35,10 @@ export interface RespostaLogin {
     usuario: Usuario;
 }
 
-// Dados da edição (o e-mail nem é enviado: ele não pode mudar)
+// Dados da edição: todos os campos são obrigatórios. O e-mail vai junto, mas é sempre o mesmo (a tela não deixa mudar)
 export interface DadosEdicao {
     nome: string;
+    email: string;
     cpf: string;
     senha: string;
 }

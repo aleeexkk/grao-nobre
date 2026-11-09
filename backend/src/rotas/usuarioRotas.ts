@@ -3,7 +3,6 @@ import type { Request, RequestHandler, Response } from "express";
 import { UsuarioServico } from "../servicos/UsuarioServico";
 import { usuarioLogado } from "../middlewares/autenticar";
 import { lerCamposTexto, lerId } from "../validadores/corpo";
-import { ErroValidacao } from "../erros/ErroValidacao";
 
 // Monta as rotas de usuário. "autenticar" é o porteiro que barra quem não está logado.
 // Os erros não precisam de try/catch aqui: o tratador de erros (middleware) cuida de todos.
@@ -28,16 +27,10 @@ export function criarRotasUsuario(servico: UsuarioServico, autenticar: RequestHa
         const logado = usuarioLogado(req);
         const idAlvo = lerId(req.params.id);
 
-        // Nome, CPF e senha são obrigatórios
-        const { nome, cpf, senha } = lerCamposTexto(req.body, ["nome", "cpf", "senha"], "Informe nome, CPF e senha.");
+        // Todos os 4 campos são obrigatórios (o e-mail precisa vir, mas o serviço só aceita o MESMO e-mail de sempre)
+        const dados = lerCamposTexto(req.body, ["nome", "email", "cpf", "senha"], "Informe nome, e-mail, CPF e senha.");
 
-        // E-mail é opcional no corpo, mas se vier tem que ser texto (o serviço confere se é o mesmo)
-        const emailBruto = (req.body as Record<string, unknown>).email;
-        if (emailBruto !== undefined && typeof emailBruto !== "string") {
-            throw new ErroValidacao("Não é permitido alterar o e-mail.");
-        }
-
-        res.json(await servico.atualizar(logado.id, idAlvo, { nome, cpf, senha, email: emailBruto }));
+        res.json(await servico.atualizar(logado.id, idAlvo, dados));
     });
 
     return rotas;

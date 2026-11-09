@@ -171,18 +171,22 @@ describe("API de usuários (cadastro, login e edição)", () => {
         });
 
         test("sem token devolve 401", async () => {
-            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", cpf: CPF_A, senha: NOVA_SENHA });
+            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", email: "ana@email.com", cpf: CPF_A, senha: NOVA_SENHA });
             assert.equal(r.status, 401);
         });
 
         test("tentar editar OUTRO usuário devolve 403", async () => {
-            const r = await chamar("PUT", `/usuarios/${bia.id}`, { nome: "Hackeada", cpf: CPF_B, senha: NOVA_SENHA }, ana.token);
+            const r = await chamar("PUT", `/usuarios/${bia.id}`, { nome: "Hackeada", email: "bia@email.com", cpf: CPF_B, senha: NOVA_SENHA }, ana.token);
             assert.equal(r.status, 403);
         });
 
-        test("campo faltando devolve 400", async () => {
-            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", cpf: CPF_A }, ana.token);
-            assert.equal(r.status, 400);
+        test("campo faltando devolve 400 (todos os campos são obrigatórios)", async () => {
+            const completo = { nome: "Ana", email: "ana@email.com", cpf: CPF_A, senha: NOVA_SENHA };
+            for (const campo of ["nome", "email", "cpf", "senha"] as const) {
+                const { [campo]: _omitido, ...semOCampo } = completo;
+                const r = await chamar("PUT", `/usuarios/${ana.id}`, semOCampo, ana.token);
+                assert.equal(r.status, 400, `sem "${campo}" deveria devolver 400`);
+            }
         });
 
         test("tentar trocar o e-mail devolve 400 e o e-mail não muda", async () => {
@@ -193,22 +197,22 @@ describe("API de usuários (cadastro, login e edição)", () => {
         });
 
         test("CPF inválido devolve 400", async () => {
-            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", cpf: "123.456.789-00", senha: NOVA_SENHA }, ana.token);
+            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", email: "ana@email.com", cpf: "123.456.789-00", senha: NOVA_SENHA }, ana.token);
             assert.equal(r.status, 400);
         });
 
         test("senha fraca devolve 400", async () => {
-            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", cpf: CPF_A, senha: "fraca" }, ana.token);
+            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", email: "ana@email.com", cpf: CPF_A, senha: "fraca" }, ana.token);
             assert.equal(r.status, 400);
         });
 
         test("CPF que já é de outra pessoa devolve 409", async () => {
-            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", cpf: CPF_B, senha: NOVA_SENHA }, ana.token);
+            const r = await chamar("PUT", `/usuarios/${ana.id}`, { nome: "Ana", email: "ana@email.com", cpf: CPF_B, senha: NOVA_SENHA }, ana.token);
             assert.equal(r.status, 409);
         });
 
         test("id inválido na URL devolve 400", async () => {
-            const r = await chamar("PUT", "/usuarios/abc", { nome: "Ana", cpf: CPF_A, senha: NOVA_SENHA }, ana.token);
+            const r = await chamar("PUT", "/usuarios/abc", { nome: "Ana", email: "ana@email.com", cpf: CPF_A, senha: NOVA_SENHA }, ana.token);
             assert.equal(r.status, 400);
         });
 

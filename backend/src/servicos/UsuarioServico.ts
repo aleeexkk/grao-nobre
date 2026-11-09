@@ -15,12 +15,12 @@ export interface DadosCadastro {
 }
 
 // Formato dos dados que chegam do front-end na edição.
-// O e-mail é opcional: se vier, precisa ser igual ao atual (e-mail não pode ser alterado)
+// Todos os campos são obrigatórios. O e-mail vem junto, mas precisa ser igual ao atual (e-mail não pode ser alterado)
 export interface DadosEdicao {
     nome: string;
+    email: string;
     cpf: string;
     senha: string;
-    email?: string;
 }
 
 // Formato do que devolvemos depois de cadastrar (sem a senha, nunca!)
@@ -89,8 +89,8 @@ export class UsuarioServico {
             throw new ErroNaoEncontrado("Usuário não encontrado.");
         }
 
-        // 3) O e-mail não pode mudar (se vier no corpo, tem que ser o mesmo de sempre)
-        if (dados.email !== undefined && dados.email.trim().toLowerCase() !== atual.email) {
+        // 3) O e-mail não pode mudar (tem que ser o mesmo de sempre)
+        if (dados.email.trim().toLowerCase() !== atual.email) {
             throw new ErroValidacao("Não é permitido alterar o e-mail.");
         }
 
