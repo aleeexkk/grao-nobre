@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import CampoTexto from "../components/CampoTexto";
 import { useAuth } from "../contexto/useAuth";
+import { useAvisoTemporario } from "../hooks/useAvisoTemporario";
 import { ErroApi } from "../servicos/api";
 import { validarEmail, validarSenhaObrigatoria } from "../validadores/validadores";
 
@@ -15,6 +16,11 @@ export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const { usuario, carregando, entrar } = useAuth();
+
+    // Aviso de "Cadastro realizado!" (só aparece se veio do cadastro) e some sozinho depois de uns segundos
+    const [avisoCadastro] = useAvisoTemporario(
+        veioDoCadastro(location.state) ? "Cadastro realizado! Entre com o seu e-mail e a sua senha." : ""
+    );
 
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -63,9 +69,9 @@ export default function Login() {
 
             <form onSubmit={aoEnviar} noValidate>
                 {/* Aviso de sucesso depois do cadastro */}
-                {veioDoCadastro(location.state) && (
+                {avisoCadastro !== "" && (
                     <p className="sucesso-api" role="status">
-                        Cadastro realizado! Entre com o seu e-mail e a sua senha.
+                        {avisoCadastro}
                     </p>
                 )}
 

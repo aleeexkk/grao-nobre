@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useAvisoTemporario } from "../../hooks/useAvisoTemporario";
 import { useDados } from "../../hooks/useDados";
 import { useMensagemFlash } from "../../hooks/useMensagemFlash";
 import { mensagemDeErro } from "../../servicos/api";
@@ -62,7 +63,8 @@ export default function ListaCrud<T extends { id: number }>({
     const [excluindo, setExcluindo] = useState(false);
     const [erroExclusao, setErroExclusao] = useState("");
     const mensagemDaTelaAnterior = useMensagemFlash();
-    const [aviso, setAviso] = useState(mensagemDaTelaAnterior); // mensagem de sucesso (vinda da tela anterior ou da exclusão)
+    // Mensagem de sucesso (vinda da tela anterior ou da exclusão). Some sozinha depois de uns segundos.
+    const [aviso, setAviso] = useAvisoTemporario(mensagemDaTelaAnterior);
 
     // useCallback mantém a MESMA função enquanto a página não muda (senão buscaria dados em loop)
     const carregar = useCallback(() => buscarPagina(pagina, limite), [buscarPagina, pagina, limite]);

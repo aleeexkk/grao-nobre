@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import EtiquetaStatus from "../../components/EtiquetaStatus";
 import ListaCrud from "../../components/crud/ListaCrud";
 import type { ColunaLista } from "../../components/crud/ListaCrud";
+import { useAvisoTemporario } from "../../hooks/useAvisoTemporario";
 import { useDados } from "../../hooks/useDados";
 import { mensagemDeErro } from "../../servicos/api";
 import { clienteItensPedido, clientePedidos } from "../../servicos/recursos";
@@ -30,7 +31,7 @@ export default function DetalhePedido() {
     const [acaoPendente, setAcaoPendente] = useState<"pago" | "cancelado" | null>(null); // aguardando "tem certeza?"
     const [mudando, setMudando] = useState(false);
     const [erroAcao, setErroAcao] = useState("");
-    const [aviso, setAviso] = useState("");
+    const [aviso, setAviso] = useAvisoTemporario(); // "Pedido marcado como pago." some sozinho
 
     const carregarPedido = useCallback(() => clientePedidos.buscar(idPedido), [idPedido]);
     const { dados: pedido, erro, carregando } = useDados(carregarPedido, recarga);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import CampoTexto from "../components/CampoTexto";
 import { useAuth } from "../contexto/useAuth";
+import { useAvisoTemporario } from "../hooks/useAvisoTemporario";
 import { atualizarPerfil, buscarPerfil, ErroApi } from "../servicos/api";
 import type { PerfilUsuario } from "../servicos/api";
 import { formatarCpf } from "../utils/formatacao";
@@ -18,7 +19,7 @@ function FormularioPerfil({ perfil }: { perfil: PerfilUsuario }) {
     const [confirmacao, setConfirmacao] = useState("");
     const [tentouEnviar, setTentouEnviar] = useState(false);
     const [erroApi, setErroApi] = useState("");
-    const [sucesso, setSucesso] = useState("");
+    const [sucesso, setSucesso] = useAvisoTemporario(); // "Dados atualizados..." some sozinho
     const [enviando, setEnviando] = useState(false);
 
     // O e-mail não entra aqui: ele não pode ser alterado
