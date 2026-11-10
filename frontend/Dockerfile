@@ -3,8 +3,7 @@
 # ---- Etapa 1: gerar o site ----
 FROM node:22-alpine AS compilar
 WORKDIR /app
-# O .npmrc tem a configuração (legacy-peer-deps) que o "npm ci" precisa
-COPY package.json package-lock.json .npmrc ./
+COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 # Endereço da API que o NAVEGADOR vai usar (é gravado dentro do site na hora do build)
