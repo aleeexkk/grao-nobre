@@ -10,6 +10,7 @@ import { EstatisticaServico } from "./servicos/EstatisticaServico";
 import { AutenticacaoServico } from "./servicos/AutenticacaoServico";
 import { TokenServico } from "./servicos/TokenServico";
 import { criarAutenticacao } from "./middlewares/autenticar";
+import { cabecalhosDeSeguranca } from "./middlewares/cabecalhosDeSeguranca";
 import { tratadorErros } from "./middlewares/tratadorErros";
 import { criarRotasAutenticacao } from "./rotas/autenticacaoRotas";
 import { criarRotasUsuario } from "./rotas/usuarioRotas";
@@ -31,12 +32,32 @@ export interface Dependencias {
     tokenServico: TokenServico;
 }
 
+// Endereços de site que podem chamar a API pelo navegador (CORS). O padrão cobre o front no modo de
+// desenvolvimento (5173), no "vite preview" (4173) e no Docker (8080). Dá pra trocar pela variável CORS_ORIGIN.
+export const ORIGENS_PADRAO: readonly string[] = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+];
+
 // Monta o aplicativo Express SEM ligar o servidor (assim os testes conseguem usar o app sozinho)
-export function criarApp(dependencias: Dependencias): Express {
+export function criarApp(dependencias: Dependencias, origensPermitidas: readonly string[] = ORIGENS_PADRAO): Express {
     const app = express();
 
-    app.use(cors()); // deixa o front-end (outra porta) chamar a API
-    app.use(express.json()); // faz o servidor entender JSON no corpo das requisições
+    app.disable("x-powered-by"); // não conta pra todo mundo que o servidor usa Express
+    app.use(cabecalhosDeSeguranca); // cabeçalhos de segurança em todas as respostas
+    app.use(
+        cors({
+            origin: [...origensPermitidas], // só esses sites (não "qualquer um") podem chamar a API pelo navegador
+            methods: ["GET", "POST", "PUT", "DELETE"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            maxAge: 600, // o navegador pode lembrar a permissão por 10 minutos
+        })
+    );
+    app.use(express.json({ limit: "10kb" })); // entende JSON no corpo (10 KB é bem mais que qualquer formulário daqui)
 
     const autenticar = criarAutenticacao(dependencias.tokenServico);
 

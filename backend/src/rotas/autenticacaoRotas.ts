@@ -10,7 +10,7 @@ export function criarRotasAutenticacao(servico: AutenticacaoServico): Router {
     // POST /auth/login -> confere e-mail e senha e devolve { token, usuario }
     rotas.post("/login", async (req: Request, res: Response) => {
         const { email, senha } = lerCamposTexto(req.body, ["email", "senha"], "Informe e-mail e senha.");
-        res.status(200).json(await servico.entrar(email, senha));
+        res.status(200).json(await servico.entrar(email, senha, req.ip ?? "")); // o IP entra na trava de tentativas
     });
 
     return rotas;

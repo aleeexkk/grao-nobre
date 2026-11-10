@@ -16,6 +16,13 @@
     // Modo estrito: obriga a tipar direito e não deixa "any" solto
     "strict": true,
 
+    // Travas extras contra erros bobos
+    "noImplicitOverride": true, // quem sobrescreve método da classe-mãe precisa escrever "override"
+    "noImplicitReturns": true, // função que devolve valor em um caminho tem que devolver em todos
+    "noFallthroughCasesInSwitch": true, // "case" sem "break" é erro
+    "noUnusedParameters": true, // parâmetro que ninguém usa é erro (nome começando com _ é permitido)
+    "noUncheckedIndexedAccess": true, // lista[i] pode ser undefined: o código precisa tratar isso
+
     // Ignora checagem dentro das bibliotecas (evita erros que não são seus)
     "skipLibCheck": true
   },

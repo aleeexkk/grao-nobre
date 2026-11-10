@@ -3,11 +3,17 @@ import { ErroValidacao } from "../erros/ErroValidacao"; // "../" = sobe uma past
 // Regex = "molde" de texto: algo + @ + algo + . + algo, sem espaços
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Tamanhos máximos (iguais aos das colunas do banco: sem isso o MySQL recusaria o dado com erro 500)
+const NOME_MAXIMO = 100;
+const EMAIL_MAXIMO = 150;
+const SENHA_MAXIMA = 64; // o bcrypt só usa os primeiros 72 bytes: acima disso a "senha" não valeria por inteiro
+
 // Confere o e-mail; se estiver errado, lança o erro personalizado
 export function validarEmail(email: string): string {
     const limpo = email.trim().toLowerCase(); // tira espaços e padroniza em minúsculo
 
-    if (!REGEX_EMAIL.test(limpo)) {
+    // O tamanho é conferido ANTES da regex (assim um texto gigante nem chega a ser analisado)
+    if (limpo.length > EMAIL_MAXIMO || !REGEX_EMAIL.test(limpo)) {
         throw new ErroValidacao("E-mail inválido.");
     }
 
@@ -46,6 +52,7 @@ export function validarSenha(senha: string): string {
     // Lista de regras: cada uma tem o teste e a mensagem de erro dela
     const regras = [
         { ok: senha.length >= 8, mensagem: "ter pelo menos 8 caracteres" },
+        { ok: senha.length <= SENHA_MAXIMA, mensagem: `ter no máximo ${SENHA_MAXIMA} caracteres` },
         { ok: /[A-Z]/.test(senha), mensagem: "ter uma letra maiúscula" },
         { ok: /[a-z]/.test(senha), mensagem: "ter uma letra minúscula" },
         { ok: /\d/.test(senha), mensagem: "ter um número" },
@@ -64,16 +71,17 @@ export function validarSenha(senha: string): string {
     return senha; // senha forte: devolve igual (a criptografia vem depois)
 }
 
-// Valida o nome: tira espaços das pontas e exige pelo menos 2 caracteres
+// Valida o nome: tira espaços das pontas e exige de 2 a 100 caracteres
 export function validarNome(nome: string): string {
     const limpo = nome.trim();
 
-    if (limpo.length < 2) {
-        throw new ErroValidacao("Nome inválido: precisa ter pelo menos 2 caracteres.");
+    if (limpo.length < 2 || limpo.length > NOME_MAXIMO) {
+        throw new ErroValidacao(`Nome inválido: use de 2 a ${NOME_MAXIMO} caracteres.`);
     }
 
     return limpo;
 }
+
 // Valida um texto obrigatório com tamanho mínimo e máximo.
 // "campo" é só o nome que aparece na mensagem de erro (ex: "Nome").
 export function validarTextoObrigatorio(

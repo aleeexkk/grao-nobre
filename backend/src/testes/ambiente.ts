@@ -93,6 +93,7 @@ export async function iniciar() {
         chamar<T>(metodo, caminho, corpo, token);
 
     return {
+        base, // endereço do servidor de teste (pra testes que precisam de um fetch "cru", com cabeçalhos próprios)
         chamar,
         logado,
         // Atalhos pra montar o cenário do teste
