@@ -8,6 +8,9 @@ dist/
 # ...exceto o modelo sem segredos (esse pode subir)
 !.env.example
 
+# Logs
+*.log
+
 # Lixo do sistema
 Thumbs.db
 .DS_Store

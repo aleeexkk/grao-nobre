@@ -20,7 +20,7 @@ npm test            # todos os testes precisam passar (fail 0)
 npm run build       # roda a checagem de tipos e gera o build; tem que terminar sem erro
 ```
 
-`npm run lint` não é usado (o ESLint do projeto não é compatível com a versão do TypeScript).
+`npm run lint` Não existe npm run lint: o ESLint foi removido porque não funciona com o TypeScript 7. A checagem de tipos do build (modo estrito, sem variável ou parâmetro sobrando) é a verificação do front.
 
 ## 3. Conferir o que vai no commit
 

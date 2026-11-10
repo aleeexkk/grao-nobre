@@ -7,6 +7,7 @@ Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-
 - Cadastro, login (JWT) e edição do próprio perfil.
 - CRUD de categorias, produtos e pedidos, com os itens de cada pedido. As listagens têm paginação.
 - O pedido começa aberto e depois vira pago ou cancelado (e aí não muda mais). O total é calculado pelo banco e o preço do item fica guardado como era na hora da venda.
+- Segurança: senha guardada com hash (bcrypt), token JWT que vence em 2 horas, trava depois de vários erros de senha, CORS restrito, limites de tamanho nos dados e cabeçalhos de segurança nas respostas.
 - Painel com os números dos pedidos pagos: média, mediana, desvio padrão, ranking de produtos, horário de pico e regressão entre preço e unidades vendidas.
 
 ## Tecnologias

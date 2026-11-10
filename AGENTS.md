@@ -43,11 +43,22 @@ Camadas, cada uma só conhece a de baixo: **rotas → serviços → repositório
   As filhas usam os ganchos `verificarRegras` e `verificarExclusao` para as regras de negócio.
 - `rotas/`: `criarRotasCrud(...)` monta POST/GET/GET:id/PUT/DELETE de qualquer recurso. Todas exigem login.
 - `erros/`: `ErroAplicacao` (abstrata) e as filhas por status (400, 401, 403, 404, 409). O `tratadorErros` converte em JSON.
+- `servicos/LimitadorDeTentativas.ts`: trava de tentativas de login (relógio injetável, por isso é testável sem esperar).
 - `testes/`: repositórios **em memória** implementam os mesmos contratos (inversão de dependência), por isso os testes
   rodam sem banco. `dependenciasDeTeste.ts` monta tudo.
 
 No front, a mesma ideia: `servicos/crud.ts` (`criarClienteCrud`) e os componentes genéricos de `components/crud/`
 (`ListaCrud`, `FormularioCrud`, `PaginaFormCrud`, `Paginacao`). Uma tela nova de CRUD só informa colunas e campos.
+
+## Segurança da API (já implementada: não remover)
+
+- Login: a senha é comparada com o hash bcrypt SEMPRE (com um hash falso se o e-mail não existe, pro tempo de resposta não
+  entregar quem tem conta). Depois de 10 erros seguidos (mesmo IP + e-mail) vem 429 por 15 minutos (`LimitadorDeTentativas`).
+- Toda resposta leva cabeçalhos de segurança (`middlewares/cabecalhosDeSeguranca.ts`); o CORS só libera os sites do front
+  (`ORIGENS_PADRAO` em `app.ts` ou a variável `CORS_ORIGIN`); o corpo da requisição tem limite de 10 KB (413 acima disso).
+- Texto grande demais ou caractere que o banco não guarda vira 400 (`tratadorErros`), nunca 500. Nome, e-mail e senha têm limite
+  de tamanho no back (`validadores.ts`) e no front (mesmos números).
+- O servidor não liga sem `JWT_SECRET` e sem as variáveis `DB_*`, e fecha as conexões do banco ao receber Ctrl+C / SIGTERM.
 
 ## Regras de negócio que os testes protegem
 
