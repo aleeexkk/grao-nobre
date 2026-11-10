@@ -1,0 +1,16 @@
+FONTES DO SITE (ficam dentro do projeto: não dependem de internet nem do Google Fonts)
+
+- Bagel Fat One (bagel-fat-one-latin-400-normal.woff2)
+  Fonte "gordinha" dos títulos, do logo e dos números grandes. Só existe no peso normal (400).
+  Fonte: https://github.com/JAMO-TYPEFACE/BagelFat
+
+- Nunito (nunito-latin-wght-normal.woff2)
+  Fonte arredondada dos textos, menus e botões. É variável: um arquivo só serve para todos os pesos (200 a 1000).
+  Fonte: https://github.com/googlefonts/nunito
+
+As duas usam a licença SIL Open Font License 1.1 (livre para usar e distribuir, inclusive em projetos de faculdade).
+O texto completo está nos arquivos LICENCA-*.txt desta pasta.
+Os arquivos .woff2 vieram dos pacotes @fontsource (só a parte "latin", que cobre todo o português).
+
+Como trocar uma fonte: troque o arquivo aqui, ajuste o bloco @font-face no começo do index.css
+e o nome em --fonte-titulo ou --fonte-texto.

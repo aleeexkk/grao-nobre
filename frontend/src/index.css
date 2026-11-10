@@ -16,6 +16,26 @@
    ========================================================================== */
 
 /* ===== 1. Cores e fontes ===== */
+
+/* As fontes ficam dentro do projeto (pasta src/fontes), então o site funciona até sem internet.
+   Bagel Fat One: a fonte "gordinha" dos títulos (só tem o peso normal).
+   Nunito: a fonte arredondada dos textos (variável: um arquivo cobre todos os pesos). */
+@font-face {
+    font-family: "Bagel Fat One";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap; /* mostra o texto na hora com a fonte reserva e troca quando a fonte chega */
+    src: url("./fontes/bagel-fat-one-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Nunito";
+    font-style: normal;
+    font-weight: 200 1000;
+    font-display: swap;
+    src: url("./fontes/nunito-latin-wght-normal.woff2") format("woff2");
+}
+
 :root {
     color-scheme: light;
 
@@ -24,6 +44,7 @@
     --torra: #8b5a2b; /* cor da marca: botões, links e barras dos gráficos */
     --torra-escura: #5c3a1a; /* o mesmo marrom, mais escuro (passar o mouse) */
     --crema: #e8c48b; /* dourado claro: detalhes sobre o fundo escuro */
+    --caramelo: #cf9a5a; /* listras do toldo e bolinha do usuário no cabeçalho */
 
     /* Fundos */
     --farinha: #f6f0e6; /* fundo da página */
@@ -42,10 +63,14 @@
 
     --sombra: 0 1px 2px rgba(46, 31, 22, 0.06), 0 10px 24px -14px rgba(46, 31, 22, 0.3);
 
-    /* Fontes do próprio computador (o site funciona até sem internet):
-       títulos com serifa (Palatino no Windows e no Mac) e textos com a fonte do sistema */
-    --fonte-titulo: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, serif;
-    --fonte-texto: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Botões em formato de pílula (arredondados). Pra voltar a cantos retos, troque por 8px */
+    --raio-botao: 999px;
+
+    /* Fontes: as do @font-face lá em cima, e depois as do computador (reserva, caso a fonte não carregue).
+       --fonte-titulo: logo e títulos (sempre com peso 400: a Bagel só tem esse peso).
+       --fonte-texto: todo o resto, inclusive os números (valores em R$ ficam mais legíveis nela) */
+    --fonte-titulo: "Bagel Fat One", "Nunito", "Segoe UI", system-ui, sans-serif;
+    --fonte-texto: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
 
     /* O grão de café, desenhado em SVG dentro do próprio CSS (nenhuma imagem extra pra baixar) */
     --grao-sobre-claro: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(35 12 12)'%3E%3Cellipse cx='12' cy='12' rx='6.5' ry='10' fill='%238b5a2b'/%3E%3Cpath d='M12 2.4c-2.6 3.2 2.6 6.4 0 9.6s2.6 6.4 0 9.6' fill='none' stroke='%23f6f0e6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
@@ -90,20 +115,21 @@ a:hover {
 h1,
 h2 {
     font-family: var(--fonte-titulo);
+    font-weight: 400; /* a Bagel Fat One só existe nesse peso (negrito seria "falsificado" pelo navegador) */
     color: var(--espresso);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
 }
 
 h1 {
     margin: 0 0 6px;
-    font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.3rem);
-    line-height: 1.15;
+    font-size: clamp(1.6rem, 1.25rem + 1.3vw, 2.15rem);
+    line-height: 1.2;
 }
 
 h2 {
     margin: 0 0 4px;
-    font-size: 1.35rem;
-    line-height: 1.25;
+    font-size: 1.3rem;
+    line-height: 1.3;
 }
 
 /* Toda tela fica dentro de um <main>: uma coluna centralizada */
@@ -147,8 +173,9 @@ main > a {
     margin-bottom: 20px;
     padding-top: 52px;
     font-family: var(--fonte-titulo);
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.7rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     color: var(--espresso);
     background: var(--grao-sobre-claro) no-repeat top center / 40px 40px;
 }
@@ -164,22 +191,37 @@ main > a {
 }
 
 /* ===== 4. Marca (grão de café no cabeçalho) ===== */
+/* A marca é um link pro painel. O grão fica numa bolinha creme (a bolinha faz o papel de "selo") */
 .cabecalho-marca {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     font-family: var(--fonte-titulo);
-    font-size: 1.35rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1;
     letter-spacing: 0.01em;
+    text-decoration: none;
     color: var(--farinha);
+}
+
+.cabecalho-marca:hover {
+    color: #ffffff;
 }
 
 .cabecalho-marca::before {
     content: "";
-    width: 26px;
-    height: 26px;
-    background: var(--grao-sobre-escuro) no-repeat center / contain;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    background: var(--grao-sobre-claro) no-repeat center / 24px 24px, var(--crema);
+    border-radius: 50%;
+    transition: transform 0.25s;
+}
+
+/* O grão dá uma viradinha quando o mouse passa */
+.cabecalho-marca:hover::before {
+    transform: rotate(-20deg);
 }
 
 /* ===== 5. Formulários e botões ===== */
@@ -270,14 +312,14 @@ button,
     padding: 10px 18px;
     font: inherit;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.2;
     color: #ffffff;
     text-align: center;
     text-decoration: none;
     background: var(--torra);
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: var(--raio-botao);
     cursor: pointer;
     transition: background-color 0.15s;
 }
@@ -310,9 +352,8 @@ form > button[type="submit"] {
 
 /* Botões pequenos (dentro das tabelas e dos cartões) */
 .botao-pequeno {
-    padding: 6px 12px;
+    padding: 6px 14px;
     font-size: 0.85rem;
-    border-radius: 7px;
 }
 
 /* Botão discreto: Editar, Cancelar, Voltar */
@@ -376,61 +417,121 @@ form > button[type="submit"] {
 }
 
 /* ===== 7. Cabeçalho (área logada) ===== */
+/* Barra escura com um "toldo" de cafeteria na borda de baixo (listras creme e caramelo, bico arredondado) */
 .cabecalho {
+    position: relative;
+    z-index: 1; /* o toldo passa por cima do começo da página */
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px 36px;
+    gap: 10px 24px;
     /* O espaço dos lados acompanha o <main>, então a marca fica alinhada com o conteúdo */
     padding: 12px max(24px, calc((100% - 1080px) / 2 + 24px));
     color: var(--farinha);
     background: var(--espresso);
 }
 
+/* O toldo: listras de 28px cortadas por uma máscara de meias-luas (uma por listra) */
+.cabecalho::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 14px;
+    pointer-events: none;
+    background: repeating-linear-gradient(90deg, var(--crema) 0 28px, var(--caramelo) 28px 56px);
+    -webkit-mask: radial-gradient(circle 14px at 14px 0, #000 13.5px, transparent 14px) 0 0 / 28px 14px repeat-x;
+    mask: radial-gradient(circle 14px at 14px 0, #000 13.5px, transparent 14px) 0 0 / 28px 14px repeat-x;
+}
+
+/* O conteúdo da tela começa um pouco mais abaixo pra o toldo não encostar no título */
+.cabecalho ~ main {
+    padding-top: 48px;
+}
+
+/* Menu: botões em pílula, com o ícone na frente. A página atual fica cheia (creme) */
 .cabecalho nav {
     display: flex;
     flex: 1;
-    gap: 24px;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 .cabecalho nav a {
-    padding: 6px 2px;
-    font-weight: 500;
-    color: rgba(246, 240, 230, 0.72);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(246, 240, 230, 0.78);
     text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s;
+    border-radius: 999px;
+    transition: color 0.15s, background-color 0.15s;
 }
 
 .cabecalho nav a:hover {
     color: #ffffff;
+    background: rgba(246, 240, 230, 0.12);
 }
 
+/* Fica depois do :hover de propósito: página atual mantém o fundo creme mesmo com o mouse em cima */
 .cabecalho nav a.ativo {
-    font-weight: 600;
-    color: #ffffff;
-    border-bottom-color: var(--crema);
+    color: var(--espresso);
+    background: var(--crema);
 }
 
+/* Ícones do menu: só traço, na cor do texto */
+.cabecalho nav svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Usuário: bolinha com a inicial, "Olá, Alex" e o botão de sair */
 .cabecalho-usuario {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.cabecalho-avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    line-height: 1;
+    color: var(--espresso);
+    background: var(--caramelo);
+    border-radius: 50%;
 }
 
 /* O "Sair" é um botão só com contorno */
 .cabecalho-usuario button {
+    margin-left: 4px;
     padding: 6px 16px;
     font-size: 0.9rem;
     color: var(--crema);
     background: transparent;
-    border-color: rgba(232, 196, 139, 0.55);
+    border: 2px solid rgba(232, 196, 139, 0.5);
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s;
 }
 
 .cabecalho-usuario button:hover {
     color: var(--espresso);
     background: var(--crema);
+    border-color: var(--crema);
 }
 
 .cabecalho :focus-visible {
@@ -640,9 +741,9 @@ form > button[type="submit"] {
     font-weight: 600;
 }
 
-/* O total é o número que importa na comanda: último item da lista, maior e em serifa */
+/* O total é o número que importa na comanda: último item da lista, maior e bem grosso */
 .cartao-pedido dl > div:last-child dd {
-    font-family: var(--fonte-titulo);
+    font-weight: 800;
     font-size: 1.7rem;
     line-height: 1.2;
     font-variant-numeric: lining-nums tabular-nums;
@@ -705,8 +806,9 @@ form > button[type="submit"] {
 }
 
 .cartao-valor {
-    font-family: var(--fonte-titulo);
-    font-size: 1.75rem;
+    /* Números e valores em R$ ficam na Nunito bem grossa: na Bagel o zero parece um "o" e atrapalha a leitura */
+    font-weight: 800;
+    font-size: 1.7rem;
     line-height: 1.2;
     color: var(--espresso);
     font-variant-numeric: lining-nums tabular-nums;
@@ -784,6 +886,23 @@ form > button[type="submit"] {
 }
 
 /* ===== 13. Telas pequenas (celular e tablet) ===== */
+/* Cabeçalho que não cabe numa linha só: marca e usuário em cima, menu embaixo */
+@media (max-width: 1100px) {
+    .cabecalho-marca {
+        order: 1;
+    }
+
+    .cabecalho-usuario {
+        order: 2;
+        margin-left: auto;
+    }
+
+    .cabecalho nav {
+        order: 3;
+        flex: 1 0 100%;
+    }
+}
+
 @media (max-width: 900px) {
     .cartoes {
         grid-template-columns: repeat(2, 1fr);
@@ -799,26 +918,29 @@ form > button[type="submit"] {
         padding: 20px 16px;
     }
 
-    /* Cabeçalho: marca e usuário em cima, menu embaixo (quebra em duas linhas se não couber) */
+    /* Cabeçalho no celular: menos espaço, sem o "Olá, Alex" (a bolinha com a inicial fica) */
     .cabecalho {
-        padding: 10px 16px;
-        gap: 6px 16px;
+        padding: 10px 16px 12px;
+        gap: 8px 12px;
     }
 
-    .cabecalho-marca {
-        order: 1;
+    .cabecalho ~ main {
+        padding-top: 36px;
     }
 
-    .cabecalho-usuario {
-        order: 2;
-        margin-left: auto;
+    /* "Escondido" só pros olhos (leitor de tela ainda lê) */
+    .cabecalho-ola {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
     }
 
-    .cabecalho nav {
-        order: 3;
-        flex: 1 0 100%;
-        flex-wrap: wrap;
-        gap: 2px 20px;
+    .cabecalho nav a {
+        padding: 7px 12px;
+        font-size: 0.9rem;
     }
 
     .filtro-periodo .campo {
@@ -847,6 +969,22 @@ form > button[type="submit"] {
 }
 
 @media (max-width: 520px) {
+    /* Menu vira uma "barra de abas": 5 colunas iguais, ícone em cima e o nome embaixo (cabe numa linha só) */
+    .cabecalho nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+    }
+
+    .cabecalho nav a {
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 2px;
+        font-size: 0.72rem;
+        text-align: center;
+        border-radius: 16px;
+    }
+
     .cartoes {
         grid-template-columns: 1fr;
     }
