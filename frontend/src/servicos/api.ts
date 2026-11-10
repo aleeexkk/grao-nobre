@@ -7,6 +7,9 @@ const URL_API: string =
         ? import.meta.env.VITE_API_URL
         : "http://localhost:3000";
 
+// Se o servidor não responder em 15 segundos, a chamada é cancelada (senão a tela ficaria "Carregando..." pra sempre)
+const TEMPO_LIMITE_MS = 15_000;
+
 // ===== Formatos dos dados que vão e voltam da API =====
 
 // Dados do cadastro
@@ -75,14 +78,18 @@ export async function requisicao<T>(
 
     let resposta: Response;
 
-    // Se o servidor estiver desligado, o fetch falha aqui (nem chega a ter resposta)
+    // Se o servidor estiver desligado (ou demorar demais), o fetch falha aqui
     try {
         resposta = await fetch(`${URL_API}${caminho}`, {
             method: metodo,
             headers: cabecalhos,
             body: corpo === undefined ? undefined : JSON.stringify(corpo),
+            signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
         });
-    } catch {
+    } catch (erro) {
+        if (erro instanceof DOMException && erro.name === "TimeoutError") {
+            throw new ErroApi("O servidor demorou demais para responder. Tente novamente.");
+        }
         throw new ErroApi("Não foi possível conectar ao servidor. Tente novamente em instantes.");
     }
 

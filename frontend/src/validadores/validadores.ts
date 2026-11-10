@@ -1,14 +1,21 @@
 // Cada função devolve "" se o dado está OK, ou a mensagem de erro se não estiver
 
+// Tamanhos máximos: os mesmos do back-end e das colunas do banco
+const NOME_MAXIMO = 100;
+const EMAIL_MAXIMO = 150;
+const SENHA_MAXIMA = 64;
+
 export function validarNome(nome: string): string {
-    return nome.trim().length < 2 ? "Informe um nome com pelo menos 2 caracteres." : "";
+    const tamanho = nome.trim().length;
+    return tamanho < 2 || tamanho > NOME_MAXIMO ? `Informe um nome de 2 a ${NOME_MAXIMO} caracteres.` : "";
 }
 
 // Molde de e-mail: algo + @ + algo + . + algo, sem espaços
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validarEmail(email: string): string {
-    return REGEX_EMAIL.test(email.trim()) ? "" : "Informe um e-mail válido.";
+    const limpo = email.trim();
+    return limpo.length <= EMAIL_MAXIMO && REGEX_EMAIL.test(limpo) ? "" : "Informe um e-mail válido.";
 }
 
 export function validarCpf(cpf: string): string {
@@ -41,6 +48,7 @@ export function validarCpf(cpf: string): string {
 export function validarSenha(senha: string): string {
     const regras = [
         { ok: senha.length >= 8, mensagem: "ter pelo menos 8 caracteres" },
+        { ok: senha.length <= SENHA_MAXIMA, mensagem: `ter no máximo ${SENHA_MAXIMA} caracteres` },
         { ok: /[A-Z]/.test(senha), mensagem: "ter uma letra maiúscula" },
         { ok: /[a-z]/.test(senha), mensagem: "ter uma letra minúscula" },
         { ok: /\d/.test(senha), mensagem: "ter um número" },
@@ -63,11 +71,6 @@ export function validarConfirmacao(senha: string, confirmacao: string): string {
 }
 
 // ===== Validadores dos CRUDs (cada um devolve "" se está OK, ou a mensagem de erro) =====
-
-// Campo obrigatório: não pode ficar vazio (nem só com espaços)
-export function validarObrigatorio(valor: string, rotulo: string): string {
-    return valor.trim() === "" ? `Preencha o campo ${rotulo}.` : "";
-}
 
 // Tamanho do texto (os mesmos limites do back-end e das colunas do banco)
 export function validarTamanho(valor: string, rotulo: string, minimo: number, maximo: number): string {

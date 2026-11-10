@@ -39,7 +39,14 @@ export default function CampoSelecao({
     return (
         <div className="campo">
             <label htmlFor={id}>{rotulo}</label>
-            <select id={id} value={valor} onChange={tratarMudanca} disabled={desabilitado} aria-invalid={erro ? true : undefined}>
+            <select
+                id={id}
+                value={valor}
+                onChange={tratarMudanca}
+                disabled={desabilitado}
+                aria-invalid={erro ? true : undefined}
+                aria-describedby={[ajuda ? `${id}-ajuda` : "", erro ? `${id}-erro` : ""].join(" ").trim() || undefined}
+            >
                 {permitirVazio && <option value="">{textoVazio}</option>}
                 {opcoes.map((opcao) => (
                     <option key={opcao.valor} value={opcao.valor}>
@@ -47,9 +54,13 @@ export default function CampoSelecao({
                     </option>
                 ))}
             </select>
-            {ajuda && <span className="campo-ajuda">{ajuda}</span>}
+            {ajuda && (
+                <span className="campo-ajuda" id={`${id}-ajuda`}>
+                    {ajuda}
+                </span>
+            )}
             {erro && (
-                <span className="campo-erro" role="alert">
+                <span className="campo-erro" id={`${id}-erro`} role="alert">
                     {erro}
                 </span>
             )}

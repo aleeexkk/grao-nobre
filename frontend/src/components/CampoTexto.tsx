@@ -44,12 +44,17 @@ export default function CampoTexto({
                 disabled={desabilitado}
                 autoComplete={autoComplete}
                 aria-invalid={erro ? true : undefined} // avisa leitores de tela que tem erro
+                aria-describedby={[ajuda ? `${id}-ajuda` : "", erro ? `${id}-erro` : ""].join(" ").trim() || undefined}
             />
             {/* Texto de ajuda (só aparece se foi passado) */}
-            {ajuda && <span className="campo-ajuda">{ajuda}</span>}
+            {ajuda && (
+                <span className="campo-ajuda" id={`${id}-ajuda`}>
+                    {ajuda}
+                </span>
+            )}
             {/* Só mostra a mensagem se existir erro */}
             {erro && (
-                <span className="campo-erro" role="alert">
+                <span className="campo-erro" id={`${id}-erro`} role="alert">
                     {erro}
                 </span>
             )}
