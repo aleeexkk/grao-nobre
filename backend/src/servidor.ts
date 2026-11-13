@@ -67,6 +67,13 @@ const app = criarApp(
     origensPermitidas
 );
 
+// Atrás do proxy (Docker) o IP de quem chama chega no cabeçalho X-Forwarded-For, preenchido pelo Nginx.
+// Só ligue (TRUST_PROXY=1) quando existe um proxy de verdade na frente: sem ele, qualquer um poderia inventar
+// o cabeçalho e escapar da trava de tentativas de login.
+if (process.env.TRUST_PROXY === "1") {
+    app.set("trust proxy", 1);
+}
+
 const porta = Number(process.env.PORT) || 3000;
 const servidor = app.listen(porta, () => {
     console.log(`Servidor rodando em http://localhost:${porta}`);

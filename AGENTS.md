@@ -6,7 +6,7 @@ Leia tudo antes de alterar código.
 ## O projeto
 
 Sistema de gestão de uma cafeteria/padaria: login, CRUD de categorias, produtos, pedidos e itens do pedido,
-e um painel de estatísticas de vendas. Projeto individual de fim de ano (Back-end, Front-end, Estatística e Tech Forge).
+e um painel de estatísticas de vendas. Projeto individual de fim de ano (Back-end, Front-end, Ferramentas DevOps e Tech Forge).
 Autor: Alex Venâncio da Silva.
 
 | Parte | Tecnologia |
@@ -29,8 +29,17 @@ npm run dev            # site em http://localhost:5173
 npm run build          # checa os tipos e gera o build
 
 # Tudo junto, no Docker (raiz do projeto, precisa do .env da raiz)
-docker compose up --build
+docker compose up --build   # site em http://localhost:8080 (a API fica em /api)
 ```
+
+## Docker (não desfazer)
+
+- `proxy` (Nginx, config em `nginx/proxy.conf`) é o **único** serviço com `ports`. `frontend`, `backend` e `banco` não
+  publicam porta nenhuma: não coloque `ports:` neles.
+- O front chama a API em `/api` (`VITE_API_URL: /api` no compose); o proxy tira o `/api` e encaminha pro backend.
+- Redes: `rede-externa` (proxy), `rede-app` (proxy, frontend, backend) e `rede-banco` (backend, banco), as duas últimas `internal`.
+- `TRUST_PROXY=1` só existe no compose (atrás do proxy o IP vem do `X-Forwarded-For`). Sem proxy, deixe desligado.
+- Dados do banco ficam no volume nomeado `dados-banco`. Senhas e `JWT_SECRET` vêm do `.env` da raiz, nunca do compose.
 
 ## Arquitetura do back-end (Tech Forge)
 

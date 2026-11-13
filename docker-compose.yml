@@ -1,32 +1,43 @@
 # Sobe o sistema inteiro com um comando:  docker compose up --build
-#   banco    -> MariaDB (cria as tabelas sozinho na primeira vez, usando banco/grao_nobre.sql)
-#   backend  -> API em http://localhost:3000
-#   frontend -> site em http://localhost:8080
+#
+#   navegador ──> proxy (Nginx, porta 8080) ──┬─ "/"     ──> frontend (o site)
+#                                             └─ "/api/" ──> backend (a API) ──> banco (MariaDB)
+#
+# Só o proxy tem porta aberta pro seu computador (http://localhost:8080).
+# O frontend, o backend e o banco ficam escondidos dentro das redes do Docker.
 # As senhas NÃO ficam aqui: vêm do arquivo .env (copie o .env.example e preencha).
 
 name: grao-nobre
 
 services:
-  banco:
-    image: mariadb:11
+  # ---- Porta de entrada: o único serviço que o mundo de fora enxerga ----
+  proxy:
+    image: nginx:alpine
     restart: unless-stopped
-    environment:
-      MARIADB_DATABASE: grao_nobre
-      MARIADB_USER: grao_nobre
-      MARIADB_PASSWORD: ${DB_PASSWORD:?Crie o arquivo .env (copie o .env.example) e preencha DB_PASSWORD}
-      MARIADB_RANDOM_ROOT_PASSWORD: "yes" # a senha do root fica aleatória (a aplicação usa o usuário grao_nobre)
     volumes:
-      - dados-banco:/var/lib/mysql # os dados sobrevivem quando os containers são desligados
-      # Tudo que estiver nesta pasta roda na PRIMEIRA vez que o banco é criado
-      - ./banco/grao_nobre.sql:/docker-entrypoint-initdb.d/01-grao_nobre.sql:ro
+      - ./nginx/proxy.conf:/etc/nginx/conf.d/default.conf:ro # regras do proxy (só leitura)
     ports:
-      - "127.0.0.1:3307:3306" # porta 3307 no seu PC (pra não bater com o MySQL do XAMPP, que usa a 3306)
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
+      - "8080:80" # a ÚNICA porta publicada de todo o sistema
+    networks:
+      - rede-externa # lado de fora (a porta 8080 sai por aqui)
+      - rede-app # lado de dentro (fala com o frontend e o backend)
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy # só abre pro público quando a API já está respondendo
 
+  # ---- O site (arquivos prontos servidos por um nginx; sem porta publicada) ----
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api # o navegador chama a API pelo mesmo endereço do site; o proxy encaminha pro backend
+    restart: unless-stopped
+    networks:
+      - rede-app
+
+  # ---- A API (sem porta publicada) ----
   backend:
     build: ./backend
     restart: unless-stopped
@@ -38,22 +49,52 @@ services:
       DB_NAME: grao_nobre
       PORT: "3000"
       JWT_SECRET: ${JWT_SECRET:?Crie o arquivo .env (copie o .env.example) e preencha JWT_SECRET}
+      TRUST_PROXY: "1" # o IP de quem chama vem do proxy (usado na trava de tentativas de login)
     depends_on:
       banco:
         condition: service_healthy # só inicia quando o banco já terminou de ligar
-    ports:
-      - "3000:3000"
+    healthcheck:
+      # Qualquer resposta HTTP (até 404) já prova que a API está de pé
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(() => process.exit(0), () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rede-app # recebe as chamadas do proxy
+      - rede-banco # conversa com o banco
 
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: http://localhost:3000 # endereço da API, visto pelo navegador
+  # ---- O banco (sem porta publicada) ----
+  banco:
+    image: mariadb:11 # MariaDB: o mesmo protocolo e a mesma linguagem SQL do MySQL
     restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "8080:80"
+    environment:
+      MARIADB_DATABASE: grao_nobre
+      MARIADB_USER: grao_nobre
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Crie o arquivo .env (copie o .env.example) e preencha DB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes" # a senha do root fica aleatória (a aplicação usa o usuário grao_nobre)
+    volumes:
+      - dados-banco:/var/lib/mysql # os dados sobrevivem quando os containers são desligados
+      # Tudo que estiver nesta pasta roda na PRIMEIRA vez que o banco é criado
+      - ./banco/grao_nobre.sql:/docker-entrypoint-initdb.d/01-grao_nobre.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - rede-banco # só o backend alcança o banco
+
+# Três redes, cada uma com um papel (quem não está na mesma rede nem enxerga o outro):
+#   rede-externa  proxy
+#   rede-app      proxy, frontend, backend  (internal: sem saída pra fora)
+#   rede-banco    backend, banco            (internal: o banco não alcança nem é alcançado de fora)
+networks:
+  rede-externa:
+  rede-app:
+    internal: true
+  rede-banco:
+    internal: true
 
 volumes:
-  dados-banco:
+  dados-banco: # volume nomeado: guarda os dados do banco mesmo depois de "docker compose down"

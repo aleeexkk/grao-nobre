@@ -1,6 +1,10 @@
 # Grão Nobre
 
-Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-end, Front-end, Estatística e Tech Forge).
+Sistema para cafeteria/padaria, feito como projeto de fim de ano do curso (Back-end, Front-end, Ferramentas DevOps e Tech Forge).
+
+## Para quem é
+
+O sistema foi pensado para o **dono de uma cafeteria ou padaria**: ele gerencia o cardápio (categorias e produtos) e os pedidos do dia e, no painel, quer ver os **horários de pico** e os **itens campeões** de venda.
 
 ## O que tem
 
@@ -67,7 +71,20 @@ Preencha `DB_PASSWORD` e `JWT_SECRET` no `.env` e rode:
 docker compose up --build
 ```
 
-O site fica em `http://localhost:8080` e a API em `http://localhost:3000`. O banco é criado sozinho na primeira vez. Para apagar tudo e começar de novo: `docker compose down -v`.
+O site fica em `http://localhost:8080` e a API em `http://localhost:8080/api` (é o Nginx que encaminha). O banco é criado sozinho na primeira vez e os dados ficam num volume (`dados-banco`), então continuam lá depois de `docker compose down`. Para apagar tudo e começar de novo: `docker compose down -v`.
+
+Como o Docker está organizado:
+
+```
+navegador ──> proxy (Nginx, porta 8080) ──┬─ "/"     ──> frontend (o site)
+                                          └─ "/api/" ──> backend (a API) ──> banco (MariaDB)
+```
+
+- **Só o `proxy` tem porta aberta** (8080). O frontend, o backend e o banco não aparecem fora do Docker.
+- Três redes: `rede-externa` (só o proxy), `rede-app` (proxy, frontend e backend) e `rede-banco` (backend e banco). As duas últimas são `internal`: não têm saída para fora.
+- As regras do proxy estão em `nginx/proxy.conf`.
+- Dados de demonstração: `docker compose exec backend node dist/scripts/popularDemonstracao.js` (precisa ter uma conta criada antes).
+- Olhar o banco por dentro: `docker compose exec banco mariadb -u grao_nobre -p grao_nobre` (a senha é a `DB_PASSWORD` do `.env`).
 
 ## Testes
 
