@@ -65,13 +65,21 @@ Na raiz do projeto:
 copy .env.example .env
 ```
 
-Preencha `DB_PASSWORD` e `JWT_SECRET` no `.env` e rode:
+Preencha `DB_PASSWORD` (invente uma senha) e `JWT_SECRET` (um texto grande e aleatório, mínimo de 16 caracteres) no `.env`. Se preferir, o PowerShell gera os dois valores aleatórios e já escreve o arquivo:
+
+```
+$senhaBanco = node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
+$segredoJwt = node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+Set-Content -Path .env -Value @("DB_PASSWORD=$senhaBanco", "JWT_SECRET=$segredoJwt") -Encoding ascii
+```
+
+Depois rode:
 
 ```
 docker compose up --build
 ```
 
-O site fica em `http://localhost:8080` e a API em `http://localhost:8080/api` (é o Nginx que encaminha). O banco é criado sozinho na primeira vez e os dados ficam num volume (`dados-banco`), então continuam lá depois de `docker compose down`. Para apagar tudo e começar de novo: `docker compose down -v`.
+O site fica em `http://localhost:8080` e a API em `http://localhost:8080/api` (é o Nginx que encaminha). O banco é criado sozinho na primeira vez e os dados ficam num volume (`dados-banco`), então continuam lá depois de `docker compose down`. Para apagar tudo e começar de novo: `docker compose down -v`. Se a porta 8080 já estiver em uso (o XAMPP, por exemplo), feche o programa que a usa e rode de novo.
 
 Como o Docker está organizado:
 
